@@ -1,0 +1,6 @@
+# Maven build output
+target/
+*.class
+
+# Generated Conjur cert (see yy.get-conjur-cert.sh)
+conjur.pem
