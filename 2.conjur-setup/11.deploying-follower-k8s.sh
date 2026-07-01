@@ -28,6 +28,7 @@ cp follower/follower.yaml /tmp/follower.yaml
 sed -i "s/CONJUR_IP/$CONJUR_IP/g" /tmp/follower.yaml
 sed -i "s/LAB_DOMAIN/$LAB_DOMAIN/g" /tmp/follower.yaml
 sed -i "s/CONJUR_VERSION/$conjur_version/g" /tmp/follower.yaml
+sed -i "s/JWT_AUDIENCE/$JWT_AUDIENCE/g" /tmp/follower.yaml
 
 kubectl -n conjur apply -f /tmp/follower.yaml
 

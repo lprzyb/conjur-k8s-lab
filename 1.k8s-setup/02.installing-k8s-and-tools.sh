@@ -1,4 +1,10 @@
 #/bin/sh
+source 00.config.sh
+
+if [[ "$READY" != true ]]; then
+    echo "Your configuration are not ready. Set READY=true in 00.config.sh when you are done"
+    exit
+fi
 
 set -x
 
@@ -27,10 +33,10 @@ sysctl --system
 cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
 [kubernetes]
 name=Kubernetes
-baseurl=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/
+baseurl=https://pkgs.k8s.io/core:/stable:/$K8S_VERSION/rpm/
 enabled=1
 gpgcheck=1
-gpgkey=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/repodata/repomd.xml.key
+gpgkey=https://pkgs.k8s.io/core:/stable:/$K8S_VERSION/rpm/repodata/repomd.xml.key
 exclude=kubelet kubeadm kubectl cri-tools kubernetes-cni
 EOF
 

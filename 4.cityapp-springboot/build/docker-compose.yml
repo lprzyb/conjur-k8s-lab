@@ -4,7 +4,7 @@ services:
     build: .
     image: cityapp-conjur-springboot-plugin
     environment:
-      CONJUR_APPLIANCE_URL: https://conjur-master.demo.local
+      CONJUR_APPLIANCE_URL: https://conjur-leader.demo.local
       CONJUR_ACCOUNT: DEMO
       CONJUR_AUTHN_LOGIN: testuser01@test
       CONJUR_AUTHN_API_KEY: <using_conjur_host_rotate-api-key_to_generate_api_key>

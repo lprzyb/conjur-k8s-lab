@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ../2.conjur-setup/00.config.sh
+source 00.config.sh
 
 if [[ "$READY" != true ]]; then
     echo "Your configuration are not ready. Set READY=true in 00.config.sh when you are done"
@@ -8,8 +8,8 @@ if [[ "$READY" != true ]]; then
 fi
 
 ESO_NS="external-secrets"
-CONJUR_FOLLOWER_URL="https:\/\/follower.conjur.svc.cluster.local"
-CONJUR_CERT="$(openssl s_client -showcerts -connect  conjur-master.$LAB_DOMAIN:443 </dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p')"
+CONJUR_FOLLOWER_URL="https://follower.conjur.svc.cluster.local"
+CONJUR_CERT="$(openssl s_client -showcerts -connect  $CONJUR_LEADER_HOST:443 </dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p')"
 
 YML_FILE="./yaml/conjur-secret-store-jwt.yaml"
 YML_TEMP="/tmp/$(date +%s).yaml"
@@ -25,8 +25,9 @@ kubectl -n $ESO_NS create configmap conjur-cm \
 
 #Prepare manifest
 cp $YML_FILE $YML_TEMP
-sed -i "s/{CONJUR_URL}/$CONJUR_FOLLOWER_URL/g" $YML_TEMP
-sed -i "s/{CONJUR_ACCOUNT}/$LAB_CONJUR_ACCOUNT/g" $YML_TEMP
+sed -i "s#{CONJUR_URL}#$CONJUR_FOLLOWER_URL#g" $YML_TEMP
+sed -i "s#{CONJUR_ACCOUNT}#$LAB_CONJUR_ACCOUNT#g" $YML_TEMP
+sed -i "s#{JWT_AUDIENCE}#$JWT_AUDIENCE#g" $YML_TEMP
 
 kubectl -n $ESO_NS get secretstore | grep -q conjur && kubectl -n $ESO_NS delete secretstore conjur
 kubectl apply -n $ESO_NS -f $YML_TEMP

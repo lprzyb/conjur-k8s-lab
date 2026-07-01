@@ -10,8 +10,8 @@ APP_NAME="cityapp-springboot"
 YML_FILE="yaml/$APP_NAME.yaml"
 YML_TEMP="/tmp/$APP_NAME.yaml"
 
-CONJUR_URL="https://conjur-master.$LAB_DOMAIN"
-CONJUR_CERT="$(openssl s_client -showcerts -connect  conjur-master.$LAB_DOMAIN:443 </dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p')"
+CONJUR_URL="https://$CONJUR_LEADER_HOST"
+CONJUR_CERT="$(openssl s_client -showcerts -connect  $CONJUR_LEADER_HOST:443 </dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p')"
 
 CONJUR_AUTHN_URL=$CONJUR_URL/authn-jwt/k8s
 
@@ -44,6 +44,9 @@ fi
 cp $YML_FILE $YML_TEMP
 sed -i "s/{LAB_IP}/$LAB_IP/g" $YML_TEMP
 sed -i "s/{LAB_DOMAIN}/$LAB_DOMAIN/g" $YML_TEMP
+sed -i "s/{DB_HOST}/$DB_HOST/g" $YML_TEMP
+sed -i "s/{CONJUR_LEADER_HOST}/$CONJUR_LEADER_HOST/g" $YML_TEMP
+sed -i "s/{JWT_AUDIENCE}/$JWT_AUDIENCE/g" $YML_TEMP
 
 #Deploy pod
 kubectl -n cityapp apply -f $YML_TEMP

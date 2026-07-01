@@ -50,7 +50,7 @@ spec:
       hostAliases:
       - ip: "{LAB_IP}"
         hostnames:
-        - "mysql.{LAB_DOMAIN}"
+        - "{DB_HOST}"
       containers:
       - name: cityapp
         image: localhost/cityapp:php
@@ -60,7 +60,7 @@ spec:
             mountPath: /conjur
             readOnly: true
       - name: conjurtok8sfile
-        image: docker.io/cyberark/secrets-provider-for-k8s:latest
+        image: docker.io/cyberark/secrets-provider-for-k8s:1.10.0
         imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: podinfo
@@ -93,4 +93,4 @@ spec:
               - serviceAccountToken:
                   path: jwt
                   expirationSeconds: 6000
-                  audience: cybrdemo
+                  audience: '{JWT_AUDIENCE}'

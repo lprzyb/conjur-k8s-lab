@@ -17,12 +17,12 @@ podman stop mysqldb
 podman rm mysqldb
 podman run --name mysqldb -v $db_dir:/docker-entrypoint-initdb.d \
      -d --restart=always \
-     -e MYSQL_ROOT_PASSWORD=Cyberark1 \
+     -e MYSQL_ROOT_PASSWORD=$DB_ROOT_PASSWORD \
      -e MYSQL_DATABASE=world \
-     -e MYSQL_USER=cityapp \
-     -e MYSQL_PASSWORD=Cyberark1 \
-     -p "3306:3306" -d docker.io/library/mysql:5.7.29
+     -e MYSQL_USER=$DB_USER \
+     -e MYSQL_PASSWORD=$DB_PASSWORD \
+     -p "3306:3306" -d docker.io/library/mysql:8.4
 
-grep -q "mysql.$LAB_DOMAIN" /etc/hosts || echo "$CONJUR_IP mysql.$LAB_DOMAIN" >> /etc/hosts
+grep -q "$DB_HOST" /etc/hosts || echo "$CONJUR_IP $DB_HOST" >> /etc/hosts
 set +x
 

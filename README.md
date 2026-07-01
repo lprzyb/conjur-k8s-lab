@@ -4,6 +4,9 @@ This project will help you to quickly build up the standalone, single VM lab env
 - k8s jwt authentication
 - conjur push to k8s file
 - conjur push to kubernetes secret
+- native Conjur Spring Boot SDK integration (no sidecar)
+- External Secrets Operator (ESO) integration
+- Conjur CSI provider integration
 - and other
 
 All setup, installing and configuration steps are all put in sequence of scripts to make the setup process quicker and easier
@@ -13,6 +16,9 @@ Comments and question, please send to <huy.do@cyberark.com>
 Thanks and kudos to @Joe Tan (joe.tan@cyberark.com) for the detail of installing and configuration guide at https://github.com/joetanx
 
 ### Video on step by step setting up this LAB is at https://youtu.be/qiXBtv5R1z4
+
+### Keeping this lab current
+Run ```./check-versions.sh``` (needs ```curl``` and ```jq```) any time before rebuilding the lab to see which pinned image/chart/dependency versions are behind their current upstream release. It only reports drift - it never edits any file.
 
 # PART I: SETING UP ENVIRONMENT
 # 1.1. LAB Prerequisites
@@ -24,11 +30,10 @@ Thanks and kudos to @Joe Tan (joe.tan@cyberark.com) for the detail of installing
     - Hostname: k8s.demo.local
     - LAN IP (eg 172.16.100.15/24)
     - Internet connection to do yum updating and packages installation
-- Conjur appliance images & utilities:
-  - Contact CyberArk local representative for following images and tools
-    - conjur-appliance-Rls-v13.2.0.tar.gz
-    - conjur-cli-rhel-8.tzr.gz
+- Conjur appliance image:
+  - Contact CyberArk local representative for the appliance tarball (e.g. conjur-appliance-Rls-v13.7.0.tar.gz)
   - CyberArk softwares and related tools can be downloaded at https://cyberark-customers.force.com/mplace/s/#software
+  - The Conjur CLI is installed automatically by ```2.conjur-setup/06.installing-conjur-cli.sh``` (downloads [conjur-cli-go](https://github.com/cyberark/conjur-cli-go) from GitHub) - no manual download needed
 
  *The IP addresses in this document are using from current lab environment. Please replace the **172.16.100.109** by your actual **VM IP**’s
     
@@ -61,15 +66,25 @@ Login to VM as root and running below command
 cd /opt/lab
 git clone https://github.com/huydd79/conjur-k8s-lab
 ```
-Installation folder contains 3 sub folders for diffirent setup
+Installation folder contains 6 sub folders for different setup
 - 1.k8s-setup: scripts to setup k8s standalone cluster environment
-- 2.conjur-setp: scripts to install podman, mysql, conjur master containers and deploying conjur follower in k8s
-- 3.cityapp-setup: scripts to deploys different types of cityapp application
+- 2.conjur-setp: scripts to install podman, mysql, conjur leader containers and deploying conjur follower in k8s
+- 3.cityapp-setup: scripts to deploy different types of cityapp application (hardcode, push-to-file, push-to-secret, springboot)
+- 4.cityapp-springboot: builds the Spring Boot cityapp image and deploys it via the native Conjur SDK (no sidecar)
+- 5.conjur-eso: installs and configures the External Secrets Operator
+- 6.conjur-csi: installs and configures the Conjur CSI provider
 
 Each folder will have ```00.config.sh``` which contains some parameters. Review file content, change all related parameters to actual value and set ```READY=true``` before doing further steps.
 
 # PART II: SETING UP CONJUR - K8S LAB
 # 2.1. Setting up K8s standalone cluster
+## **Step2.1.0: Reviewing 00.config.sh**
+Login to VM as root, edit the 00.config.sh
+```
+cd /opt/lab/conjur-k8s-lab/1.k8s-setup
+vi 00.config.sh
+```
+Set ```K8S_VERSION``` to the Kubernetes/CRI-O minor version to install (e.g. ```v1.35```) and set ```READY=true``` to continue. CRI-O and kubelet/kubeadm/kubectl must use the same minor version.
 ## **Step2.1.1: Installing cri-o**
 Login to VM as root, running below command to install cri-o
 ```
@@ -145,21 +160,21 @@ cd /opt/lab/conjur-k8s-lab/2.conjur-setup
 ```
 Using command ```podman container ls``` to make sure mysql container is up and running.
 Using command ```ping mysql.demo.local``` to make sure host entry has been added correctly
-## **Step2.2.4: Installing conjur master**
+## **Step2.2.4: Installing conjur leader**
 Login to VM as root and running below commands
 ```
 cd /opt/lab/conjur-k8s-lab/2.conjur-setup
 ./03.loading-conjur-images.sh
 ./04.starting-conjur-container.sh
-./05.configuring-conjur-master.sh
+./05.configuring-conjur-leader.sh
 ```
 Using command ```podman image ls | grep conjur``` to make sure that image is loaded correctly
 
 Using command ```podman container ls``` to make sure that conjur1 container is up and running
 
-Using command ```curl -k https://conjur-master.demo.local/info``` to check conjur master status
+Using command ```curl -k https://conjur-leader.demo.local/info``` to check conjur leader status
 
-Using browser and put in conjur master URL ```https://<VMIP>```, login using user admin and password was set in ```00.config.sh``` file
+Using browser and put in conjur leader URL ```https://<VMIP>```, login using user admin and password was set in ```00.config.sh``` file
 ```
 https://<VM-IP>/
 ```
@@ -173,7 +188,7 @@ cd /opt/lab/conjur-k8s-lab/2.conjur-setup
 ./06.installing-conjur-cli.sh
 ```
 
-Enter ```yes``` for ```Trust this certificate``` question and providing admin password for conjur cli configuration. 
+The script installs the [conjur-cli-go](https://github.com/cyberark/conjur-cli-go) binary, runs ```conjur init self-hosted``` (self-signed cert trusted automatically via ```-s```), then ```conjur login``` - enter the admin password when prompted.
 
 Using command ```conjur whoami``` to doublecheck the result.
 
@@ -184,7 +199,7 @@ cd /opt/lab/conjur-k8s-lab/2.conjur-setup
 ./07.loading-demo-data.sh
 ./08.enable-k8s-jwt-authenticator.sh
 ```
-Using ```curl -k https://conjur-master.demo.local/info``` to see the authenticaion options that are enabled.
+Using ```curl -k https://conjur-leader.demo.local/info``` to see the authenticaion options that are enabled.
 ```
 ...
   "authenticators": {
@@ -364,39 +379,130 @@ INFO:  2022/11/20 17:51:05.690806 provide_conjur_secrets.go:184: CSPFK009I DAP/C
 Using browser and go to ```http://<VM-IP>:30082``` to see the result
 ![cityapp](./images/12.cityapp-conjurtok8ssecret.png)
 
-# 3.5. Running cityapp-secretless
-Application cityapp-secretless is configured with sidecar container (secretless-broker) which is run in the same pod with cityapp. The sidecar will connect to conjur follower pod, using jwt authentication method and check for database credentials. After that, sidecar will host the mysql service and proxy-ing all mysql queries from main container to database. The ```cityapp``` main container will not need to know database credentials anymore.
+# 3.5. Building and running cityapp-springboot
+This is a Java/Spring Boot rewrite of cityapp, built from ```4.cityapp-springboot/build/``` (a Maven project). Its business logic and web page are the same as the PHP cityapp, but it can be deployed two different ways that are worth trying separately.
 
-The architecture of this method is described at below CyberArk document link.
-[CyberArk Secret Provider: Secretless broker](https://docs.cyberark.com/Product-Doc/OnlineHelp/AAM-DAP/12.4/en/Content/Overview/scl_how_it_works.htm?TocPath=Fundamentals%7CSecretless%20pattern%7C_____2 "Secretless broker")
+## Step3.5.1: Building the image
+Login to VM as root, running below command
+```
+cd /opt/lab/conjur-k8s-lab/4.cityapp-springboot
+vi 00.config.sh
+```
+Set ```READY=true```, then build the image:
+```
+./41.building-cityapp-image.sh
+```
+This installs Java 17, runs the Maven build, and tags the result ```cityapp-springboot```. If the build tools aren't available it automatically falls back to pulling a prebuilt image instead, so this step always produces something usable either way.
 
-![secretless](./images/cj-secretless.png)
+## Step3.5.2: Deploying cityapp-springboot - two options
+Both options below deploy to the **same** namespace, Deployment/Service name (```cityapp-springboot```), and NodePort (```30088```) - they're alternatives, not simultaneous demos. Applying one replaces the other.
 
-Login to VM as root, running below command to deploy cityapp-secretless
+**Option A - secrets-provider-for-k8s sidecar** (same mechanism as Step 3.3/3.4 above, just with the Java app instead of PHP):
 ```
 cd /opt/lab/conjur-k8s-lab/3.cityapp-setup
-./05.running-cityapp-secretless.sh 
+./06.running-cityapp-springboot.sh
 ```
 
-In k8s dashboard's GUI, checking for sidecar's log in secretless pod, the detail of conjur jwt authentication and secret pushing will be shown as below
+**Option B - native Conjur Spring Boot SDK** (the app itself calls the Conjur API directly at startup via `ConjurSpringDbConfig.java` - no sidecar, no secrets-provider-for-k8s):
 ```
-2022/11/21 01:02:02 Secretless v1.7.14-552c75c8 starting up...
-2022/11/21 01:02:02 Initializing health check on :5335...
-2022/11/21 01:02:02 Initialization of health check done. You can access the endpoint at `/live` and `/ready`.
-2022/11/21 01:02:02 [WARN]  Plugin hashes were not provided - tampering will not be detectable!
-2022/11/21 01:02:02 Trying to load configuration file: /etc/secretless/cityapp-secretless-cm.yaml
-2022/11/21 01:02:02 WARN: v1 configuration is now deprecated and will be removed in a future release
-2022/11/21 01:02:02 [INFO]  Configuration found. Loading...
-2022/11/21 01:02:02 [INFO]  Validating config against available plugins: ssh,ssh-agent,pg,mysql,mssql,basic_auth,conjur,generic_http,aws
-2022/11/21 01:02:02 [INFO]  Starting TCP listener on 0.0.0.0:3306...
-2022/11/21 01:02:02 [INFO]  cityapp-mysql-handler: Starting service
-2022/11/21 01:02:02 Registering reload signal listeners...
+cd /opt/lab/conjur-k8s-lab/4.cityapp-springboot
+./42.running-cityapp-springboot.sh
 ```
 
-Using browser and go to ```http://<VM-IP>:30083``` to see the result
-![cityapp](./images/13.cityapp-secretless.png)
+Using browser and go to ```http://<VM-IP>:30088``` to see the result, whichever option you deployed.
 
-Now you can see the cityapp main container is accessing database at localhost, using empty username and password.
+# PART III-A: TESTING EXTERNAL SECRETS OPERATOR (ESO)
+Unlike the sidecar-based variants above, this section shows secrets flowing into Kubernetes from *outside* the pod entirely: the External Secrets Operator (ESO) authenticates to Conjur on its own and syncs a value into a native Kubernetes Secret, and the app that consumes it needs no Conjur awareness at all - no sidecar, no ServiceAccount, no JWT token.
+
+## Step3A.1: Reviewing 00.config.sh
+```
+cd /opt/lab/conjur-k8s-lab/5.conjur-eso
+vi 00.config.sh
+```
+Set ```READY=true``` to continue - this folder reuses the same ```2.conjur-setup/00.config.sh``` values (domain, DB credentials, JWT audience).
+
+## Step3A.2: Installing ESO
+```
+cd /opt/lab/conjur-k8s-lab/5.conjur-eso
+./00.installing-eso-helm.sh
+```
+Installs Helm if missing, then the ```external-secrets``` Helm chart into its own namespace.
+
+## Step3A.3: Loading the ESO Conjur policy
+```
+./01.adding-conjur-eso-policy.sh
+```
+Grants the ESO service account JWT authentication access, and sets a second demo variable set (```test/host2/host```, ```test/host2/user```, ```test/host2/pass```) to the same working database credentials used elsewhere in the lab.
+
+## Step3A.4: Creating the Conjur SecretStore
+```
+./02.creating-ext-secret-store.sh
+```
+Registers Conjur as an ESO ```SecretStore``` using JWT auth against the Conjur follower.
+
+## Step3A.5: Creating the ExternalSecret
+```
+./03.creating-eso-secret.sh
+```
+Tells ESO to sync ```test/host2/*``` into a native Kubernetes Secret named ```conjur-secret```.
+
+## Step3A.6: Verifying the synced secret
+```
+./04.getting-eso-secret.sh
+```
+Prints the ```ExternalSecret``` sync status and the decoded contents of ```conjur-secret```.
+
+## Step3A.7: Running cityapp-eso
+```
+./05.running-cityapp-eso.sh
+```
+Deploys the same ```cityapp``` PHP image built in Part III, unmodified, mounting ```conjur-secret``` directly at ```/etc/secret-volume```. Using browser and go to ```http://<VM-IP>:30084``` to see the result - the page will show the secret source as "K8S SECRETS", same as ```cityapp-conjurtok8ssecret```, but this Secret was populated by ESO rather than a sidecar.
+
+# PART III-B: TESTING THE CONJUR CSI PROVIDER
+A third way to deliver secrets into a pod: the Kubernetes Secrets Store CSI Driver mounts them directly as a volume, resolved live by CyberArk's Conjur CSI provider at mount time. The provider authenticates using an explicit identity rather than auto-resolving one from JWT claims, so - like ESO - the app itself needs no ServiceAccount token projection, sidecar, or Conjur awareness.
+
+## Step3B.1: Reviewing 00.config.sh
+```
+cd /opt/lab/conjur-k8s-lab/6.conjur-csi
+vi 00.config.sh
+```
+Set ```READY=true``` to continue. This folder reuses ```2.conjur-setup/00.config.sh``` and additionally defines ```CSI_JWT_AUDIENCE``` (default ```conjur```) - the audience the CSI driver requests tokens with, distinct from the lab's shared ```JWT_AUDIENCE```.
+
+## Step3B.2: Installing the Secrets Store CSI Driver
+```
+./00.installing-csi-helm.sh
+```
+Installs Helm if missing, then the ```secrets-store-csi-driver``` chart into ```kube-system```.
+
+## Step3B.3: Loading the CSI Conjur policy
+```
+./01.adding-conjur-csi-jwt-policy.sh
+```
+Defines a second, CSI-specific JWT authenticator (```authn-jwt/k8s-csi```, distinct from the ```authn-jwt/k8s``` used everywhere else) and its host identity.
+
+## Step3B.4: Redeploying the Conjur follower with CSI support
+```
+./02.redeploy-follower-with-k8s-csi.sh
+```
+Replaces the follower deployed in Part II with one that has both ```authn-jwt/k8s``` and ```authn-jwt/k8s-csi``` enabled.
+
+## Step3B.5: Installing the Conjur CSI provider
+```
+./03.installing-conjur-csi-provider.sh
+```
+Installs CyberArk's ```conjur-k8s-csi-provider``` Helm chart into ```kube-system```.
+
+## Step3B.6: Creating the SecretProviderClass
+```
+./04.creating-secret-provider-class.sh
+```
+Creates a ```SecretProviderClass``` named ```conjur-credentials``` in the ```cityapp``` namespace, pointing at the Conjur follower.
+
+## Step3B.7: Running cityapp-csi
+```
+./05.running-cityapp-csi-test.sh
+```
+Deploys ```cityapp-csi```, mounting secrets via the CSI volume at ```/etc/secret-volume``` (resolved from ```test/host1/*```, the same working demo credentials used since Part II). Using browser and go to ```http://<VM-IP>:30086``` to see the result.
 
 # PART IV: FINAL TESTING
 Login to conjur GUI, change the value of secret ```test/host1/user```, ``` test/host1/pass``` and wait for 30 seconds. Refeshing the cityapp webpages to see if the credential values can be changed

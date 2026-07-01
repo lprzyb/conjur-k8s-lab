@@ -42,11 +42,11 @@ spec:
       hostAliases:
       - ip: "{LAB_IP}"
         hostnames:
-        - "mysql.{LAB_DOMAIN}"
-        - "conjur-master.{LAB_DOMAIN}"
+        - "{DB_HOST}"
+        - "{CONJUR_LEADER_HOST}"
       containers:
       - name: cityapp
-        image: docker.io/huydd79/cityapp-springboot
+        image: localhost/cityapp-springboot:latest
         imagePullPolicy: IfNotPresent
         env:
           - name: DB_HOST
@@ -82,4 +82,4 @@ spec:
               - serviceAccountToken:
                   path: jwt
                   expirationSeconds: 6000
-                  audience: cybrdemo                        
+                  audience: '{JWT_AUDIENCE}'

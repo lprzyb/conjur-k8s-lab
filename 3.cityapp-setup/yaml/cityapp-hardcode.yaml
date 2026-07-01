@@ -39,18 +39,18 @@ spec:
       hostAliases:
       - ip: "{LAB_IP}"
         hostnames:
-        - "mysql.{LAB_DOMAIN}"
+        - "{DB_HOST}"
       containers:
       - image: localhost/cityapp:php
         imagePullPolicy: IfNotPresent
         name: cityapp
         env:
           - name: DBADDR
-            value: mysql.{LAB_DOMAIN}
+            value: '{DB_HOST}'
           - name: DBUSER
-            value: cityapp
+            value: '{DB_USER}'
           - name: DBPASS
-            value: Cyberark1
+            value: '{DB_PASSWORD}'
         ports:
         - containerPort: 80
           name: http

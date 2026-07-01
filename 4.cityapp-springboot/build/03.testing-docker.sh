@@ -2,7 +2,7 @@
 
 set -x
 
-CONJUR_CERT="$(openssl s_client -showcerts -connect  conjur-master.demo.local:443 </dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p')"
+CONJUR_CERT="$(openssl s_client -showcerts -connect  conjur-leader.demo.local:443 </dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p')"
 
 sudo podman ps -a | grep cityapp
     if [[ $? -eq 0 ]]; then
@@ -16,7 +16,7 @@ sudo podman run \
         --detach -p 8080:8080 \
         --restart=unless-stopped \
         --env CONJUR_ACCOUNT=DEMO \
-        --env CONJUR_APPLIANCE_URL=https://conjur-master.demo.local \
+        --env CONJUR_APPLIANCE_URL=https://conjur-leader.demo.local \
         --env CONJUR_AUTHN_LOGIN=testuser01@test \
         --env CONJUR_AUTHN_API_KEY=<using_conjur_host_rotate-api-key_to_generate_api_key> \
         --env "CONJUR_SSL_CERTIFICATE=${CONJUR_CERT}" \

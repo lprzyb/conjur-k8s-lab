@@ -1,6 +1,6 @@
 #/bin/sh
 
-source ../2.conjur-setup/00.config.sh
+source 00.config.sh
 
 if [[ "$READY" != true ]]; then
     echo "Your configuration are not ready. Set READY=true in 00.config.sh when you are done"
@@ -31,6 +31,7 @@ fi
 cp $YML_FILE $YML_TEMP
 sed -i "s/{LAB_IP}/$LAB_IP/g" $YML_TEMP
 sed -i "s/{LAB_DOMAIN}/$LAB_DOMAIN/g" $YML_TEMP
+sed -i "s/{DB_HOST}/$DB_HOST/g" $YML_TEMP
 
 kubectl -n cityapp apply -f $YML_TEMP
 

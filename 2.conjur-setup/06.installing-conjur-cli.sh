@@ -7,12 +7,9 @@ if [[ "$READY" != true ]]; then
 fi
 
 set -x
-curl -s -LOJ https://github.com/cyberark/conjur-api-python3/releases/download/v7.0.1/conjur-cli-rhel-8.tar.gz
-tar xvf conjur-cli-rhel-8.tar.gz
-chmod 755 ./conjur
-cp ./conjur /usr/local/bin
-conjur init -u https://conjur-master.$LAB_DOMAIN
+curl -s -Lo /usr/local/bin/conjur https://github.com/cyberark/conjur-cli-go/releases/latest/download/conjur_linux_amd64
+chmod 755 /usr/local/bin/conjur
+conjur init self-hosted -u https://$CONJUR_LEADER_HOST -a $LAB_CONJUR_ACCOUNT -s
 conjur login -i admin
 set +x
 conjur whoami
-

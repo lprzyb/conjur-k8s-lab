@@ -1,5 +1,10 @@
 #!/bin/bash
+source 00.config.sh
 
+if [[ "$READY" != true ]]; then
+    echo "Your configuration are not ready. Set READY=true in 00.config.sh when you are done"
+    exit
+fi
 
 set -x
 
@@ -21,8 +26,9 @@ if [ $? -ne 0 ]; then
 	secrets-store-csi-driver/secrets-store-csi-driver \
 	--wait \
 	--namespace kube-system \
+	--version 1.6.0 \
 	--set syncSecret.enabled="false" \
-	--set 'tokenRequests[0].audience=conjur'
+	--set "tokenRequests[0].audience=$CSI_JWT_AUDIENCE"
 else
     echo "Helm chart for csi-secrets-store has been installed"
     echo "Delete it with command: helm delete -n kube-system csi-secrets-store"

@@ -1,5 +1,10 @@
 #!/bin/bash
+source 00.config.sh
 
+if [[ "$READY" != true ]]; then
+    echo "Your configuration are not ready. Set READY=true in 00.config.sh when you are done"
+    exit
+fi
 
 set -x
 
@@ -22,6 +27,7 @@ if [ $? -ne 0 ]; then
 	external-secrets/external-secrets \
 	-n external-secrets \
 	--create-namespace \
+	--version 2.7.0 \
 	#--set installCRDs=false
 else
     echo "Helm chart for external-secrets has been installed"

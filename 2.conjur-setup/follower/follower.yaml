@@ -39,7 +39,7 @@ spec:
       hostAliases:
       - ip: "CONJUR_IP"
         hostnames:
-        - "conjur-master.LAB_DOMAIN"
+        - "conjur-leader.LAB_DOMAIN"
       containers:
       - name: conjur-appliance
         image: registry.tld/conjur-appliance:CONJUR_VERSION
@@ -66,7 +66,7 @@ spec:
             readOnly: true
       initContainers:
       - name: authenticator
-        image: docker.io/cyberark/dap-seedfetcher
+        image: docker.io/cyberark/dap-seedfetcher:0.8
         imagePullPolicy: IfNotPresent
         env:
           - name: MY_POD_NAME
@@ -106,6 +106,6 @@ spec:
         projected:
           sources:
           - serviceAccountToken:
-              audience: cybrdemo
+              audience: JWT_AUDIENCE
               path: jwt
               expirationSeconds: 6000

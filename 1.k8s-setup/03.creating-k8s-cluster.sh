@@ -1,4 +1,10 @@
 #/bin/sh
+source 00.config.sh
+
+if [[ "$READY" != true ]]; then
+    echo "Your configuration are not ready. Set READY=true in 00.config.sh when you are done"
+    exit
+fi
 
 set -x
 
@@ -10,8 +16,8 @@ mkdir -p $HOME/.kube
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 kubectl taint nodes --all node-role.kubernetes.io/control-plane-
 
-#Install Flannel networking
-kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
+#Install Flannel networking (pinned to latest release, not the moving master branch)
+kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
 
 #Wait until cni0 up and runing
 ret=1

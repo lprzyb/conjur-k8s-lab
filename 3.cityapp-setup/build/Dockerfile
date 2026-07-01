@@ -1,4 +1,4 @@
-FROM php:apache
+FROM php:8.4-apache
 LABEL maintainer="Joe Tan <joe.tan@cyberark.com>"
 LABEL description="CityApp based on Apache and PHP"
 RUN docker-php-ext-install pdo_mysql && echo "<?php phpinfo(); ?>" >> /var/www/html/info.php

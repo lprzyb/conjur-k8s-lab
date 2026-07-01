@@ -34,12 +34,17 @@ spec:
     metadata:
       labels:
         app: cityapp-csi
+      annotations:
+        conjur.org/secrets: |
+          - "dbaddr": "test/host1/host"
+          - "dbuser": "test/host1/user"
+          - "dbpass": "test/host1/pass"
     spec:
       serviceAccountName: k8s-csi
       hostAliases:
       - ip: "{LAB_IP}"
         hostnames:
-        - "mysql.{LAB_DOMAIN}"
+        - "{DB_HOST}"
       containers:
       - image: localhost/cityapp:php
         imagePullPolicy: IfNotPresent

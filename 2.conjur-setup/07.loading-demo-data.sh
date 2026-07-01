@@ -9,8 +9,8 @@ fi
 set -x
 conjur -d policy load -f ./policies/root-policy.yaml -b root
 conjur -d policy load -f ./policies/demo-data.yaml -b root
-conjur variable set -i test/host1/host -v mysql.$LAB_DOMAIN
-conjur variable set -i test/host1/user -v cityapp
-conjur variable set -i test/host1/pass -v Cyberark1
+conjur variable set -i test/host1/host -v $DB_HOST
+conjur variable set -i test/host1/user -v $DB_USER
+conjur variable set -i test/host1/pass -v $DB_PASSWORD
 set +x
 

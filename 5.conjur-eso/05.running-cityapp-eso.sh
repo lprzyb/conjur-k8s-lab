@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/bash
 source 00.config.sh
 
 if [[ "$READY" != true ]]; then
@@ -6,34 +6,35 @@ if [[ "$READY" != true ]]; then
     exit
 fi
 
-APP_NAME="cityapp-hardcode"
+ESO_NS="external-secrets"
+APP_NAME="cityapp-eso"
 YML_FILE="yaml/$APP_NAME.yaml"
 YML_TEMP="/tmp/$APP_NAME.yaml"
 
 set -x
-kubectl get namespace | grep -q cityapp || kubectl create namespace cityapp
-kubectl -n cityapp get deployments | grep -q $APP_NAME
+
+#Delete current deployment
+kubectl -n $ESO_NS get deployments | grep -q $APP_NAME
 if [ $? -eq 0 ]; then
-    kubectl -n cityapp delete deployment $APP_NAME
+    kubectl -n $ESO_NS delete deployment $APP_NAME
     ret=0
     until [ $ret -ne 0 ]
     do
-        kubectl -n cityapp get deployments | grep -q $APP_NAME
+        kubectl -n $ESO_NS get deployments | grep -q $APP_NAME
         ret=$?
         echo "Waiting deployment is deleted..."
         sleep 1
     done
-    
+
 fi
 
+#Prepare manifest
 cp $YML_FILE $YML_TEMP
 sed -i "s/{LAB_IP}/$LAB_IP/g" $YML_TEMP
-sed -i "s/{LAB_DOMAIN}/$LAB_DOMAIN/g" $YML_TEMP
 sed -i "s/{DB_HOST}/$DB_HOST/g" $YML_TEMP
-sed -i "s/{DB_USER}/$DB_USER/g" $YML_TEMP
-sed -i "s/{DB_PASSWORD}/$DB_PASSWORD/g" $YML_TEMP
 
-kubectl -n cityapp apply -f $YML_TEMP
+#Deploy pod
+kubectl -n $ESO_NS apply -f $YML_TEMP
 
 rm $YML_TEMP
 set +x

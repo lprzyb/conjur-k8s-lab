@@ -22,6 +22,6 @@ podman run --name $node_name \
   --log-opt max-file=3 \
   registry.tld/conjur-appliance:$conjur_version
 
-grep -q "conjur-master.$LAB_DOMAIN" /etc/hosts || echo "$CONJUR_IP conjur1.$LAB_DOMAIN conjur-master.$LAB_DOMAIN" >> /etc/hosts
+grep -q "$CONJUR_LEADER_HOST" /etc/hosts || echo "$CONJUR_IP conjur1.$LAB_DOMAIN $CONJUR_LEADER_HOST" >> /etc/hosts
 
 set +x

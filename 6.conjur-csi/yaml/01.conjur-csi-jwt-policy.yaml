@@ -6,6 +6,7 @@
 
   - !variable public-keys
   - !variable issuer
+  - !variable audience
 
   - !group apps
   - !permit
@@ -30,7 +31,7 @@
     id: k8s-csi-host
     annotations:
       authn-jwt/k8s-csi/kubernetes.io/namespace: cityapp
-      #authn-jwt/k8s-csi/kubernetes.io/serviceaccount/name: k8s-csi
+      authn-jwt/k8s-csi/kubernetes.io/serviceaccount/name: k8s-csi
 
 - !grant
   roles:

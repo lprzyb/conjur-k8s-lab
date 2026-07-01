@@ -74,11 +74,6 @@
       authn-jwt/k8s/kubernetes.io/namespace: cityapp
       authn-jwt/k8s/kubernetes.io/serviceaccount/name: cityapp-conjurtok8sfile
   - !host
-    id: system:serviceaccount:cityapp:cityapp-secretless
-    annotations:
-      authn-jwt/k8s/kubernetes.io/namespace: cityapp
-      authn-jwt/k8s/kubernetes.io/serviceaccount/name: cityapp-secretless
-  - !host
     id: system:serviceaccount:cityapp:cityapp-conjurtok8ssecret
     annotations:
       authn-jwt/k8s/kubernetes.io/namespace: cityapp
@@ -93,7 +88,6 @@
     role: !layer cityapp
     members:
     - !host system:serviceaccount:cityapp:cityapp-conjurtok8sfile
-    - !host system:serviceaccount:cityapp:cityapp-secretless
     - !host system:serviceaccount:cityapp:cityapp-conjurtok8ssecret
     - !host system:serviceaccount:cityapp:cityapp-springboot
 
