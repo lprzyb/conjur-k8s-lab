@@ -6,12 +6,11 @@
   <head>
     <meta http-equiv="refresh" content="30">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%226%22 fill=%22%23212529%22/><text x=%2216%22 y=%2223%22 font-size=%2220%22 font-family=%22sans-serif%22 font-weight=%22bold%22 fill=%22%236cc24a%22 text-anchor=%22middle%22>A</text></svg>">
-    <title>CyberArk Demo</title>
+    <title>Idira Demo</title>
     <style>
       body { font-family: sans-serif; margin: 0; background: #f8f9fa; color: #212529; }
       header { background: #212529; padding: 14px 20px; }
-      .logo { color: #fff; font-size: 1.3em; font-weight: 700; letter-spacing: 0.02em; text-decoration: none; }
-      .logo span { color: #6cc24a; }
+      .logo { color: #6cc24a; font-size: 1.3em; font-weight: 700; letter-spacing: 0.02em; text-decoration: none; }
       main { max-width: 700px; margin: 0 auto; padding: 24px 20px; text-align: center; }
       h1 { font-weight: 300; }
       table { width: 100%; border-collapse: collapse; margin: 16px 0; }
@@ -27,10 +26,10 @@
   </head>
   <body>
     <header>
-      <span class="logo">Cyber<span>Ark</span></span>
+      <span class="logo">Idira</span>
     </header>
     <main>
-      <h1>CyberArk Integration: CityApp SpringBoot Demo</h1>
+      <h1>Idira Integration: CityApp SpringBoot Demo</h1>
       <h2>Random World Cities</h2>
       <c:if test="${!empty cities}">
       <table>
@@ -61,10 +60,10 @@
           dbpass = System.getenv("DB_PASS");
           dbHostDisplay = System.getenv("DB_HOST") + ":" + System.getenv("DB_PORT");
         } else {
-          secretSource = "CONJUR: " + conjur;
+          secretSource = "SECRETS MANAGER: " + conjur;
           dbuser = "getting from " + System.getenv("CONJUR_MAPPING_DB_USER");
           dbpass = "getting from " + System.getenv("CONJUR_MAPPING_DB_PASS");
-          dbHostDisplay = "resolved via Conjur SDK at startup";
+          dbHostDisplay = "resolved via Secrets Manager SDK at startup";
         }
       %>
       <div class="card">
@@ -75,12 +74,12 @@
       </div>
 
       <p>
-        <a href="https://docs.cyberark.com" class="btn btn-primary">CyberArk Docs</a>
-        <a href="https://cyberark-customers.force.com/mplace/s/" class="btn btn-secondary">CyberArk Marketplace</a>
+        <a href="https://docs.cyberark.com" class="btn btn-primary">Idira Docs</a>
+        <a href="https://cyberark-customers.force.com/mplace/s/" class="btn btn-secondary">Idira Marketplace</a>
       </p>
     </main>
     <footer>
-      <p>A CyberArk demo by Joe Tan (joe.tan@cyberark.com)</p>
+      <p>An Idira demo by Joe Tan (joe.tan@cyberark.com)</p>
       <p>Converting to SpringBoot by Huy Do (huy.do@cyberark.com)</p>
     </footer>
   </body>

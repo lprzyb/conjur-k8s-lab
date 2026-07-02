@@ -36,7 +36,7 @@ RC=$?
 rm /tmp/follower.yaml
 set +x
 if [ $RC -eq 0 ]; then
-    printf '\033[1;32m✅ Done:\033[0m Conjur Follower redeployed with authn-jwt/k8s-csi enabled.\n'
+    printf '\033[1;32m✅ Done:\033[0m Secrets Manager Follower redeployed with authn-jwt/k8s-csi enabled.\n'
     printf '\033[1;33m➡️  Next:\033[0m run ./03.installing-conjur-csi-provider.sh\n'
 else
     printf '\033[1;31m❌ Failed:\033[0m Follower redeployment failed (exit %s) - check the output above.\n' "$RC"

@@ -36,8 +36,8 @@ RC=$?
 rm /tmp/follower.yaml
 set +x
 if [ $RC -eq 0 ]; then
-    printf '\033[1;32m✅ Done:\033[0m Conjur Follower deployed - browse https://%s:30444/info\n' "$CONJUR_IP"
+    printf '\033[1;32m✅ Done:\033[0m Secrets Manager Follower deployed - browse https://%s:30444/info\n' "$CONJUR_IP"
     printf '\033[1;33m➡️  Next:\033[0m cd ../3.cityapp-setup and review 00.config.sh\n'
 else
-    printf '\033[1;31m❌ Failed:\033[0m Conjur Follower deployment failed (exit %s) - check the output above.\n' "$RC"
+    printf '\033[1;31m❌ Failed:\033[0m Secrets Manager Follower deployment failed (exit %s) - check the output above.\n' "$RC"
 fi

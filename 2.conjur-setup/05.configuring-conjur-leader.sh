@@ -21,7 +21,7 @@ podman exec $leaderContainer evoke configure $serverType \
 RC=$?
 set +x
 if [ $RC -eq 0 ]; then
-    printf '\033[1;32m✅ Done:\033[0m Conjur Leader configured - browse https://%s/\n' "$CONJUR_IP"
+    printf '\033[1;32m✅ Done:\033[0m Secrets Manager Leader configured - browse https://%s/\n' "$CONJUR_IP"
     printf '\033[1;33m➡️  Next:\033[0m run ./06.installing-conjur-cli.sh\n'
 else
     printf '\033[1;31m❌ Failed:\033[0m evoke configure %s failed (exit %s) - run "podman logs %s" to see why.\n' "$serverType" "$RC" "$leaderContainer"

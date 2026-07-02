@@ -19,7 +19,7 @@ conjur variable set -i test/host1/pass -v $DB_PASSWORD
 RC5=$?
 set +x
 if [ $RC1 -eq 0 ] && [ $RC2 -eq 0 ] && [ $RC3 -eq 0 ] && [ $RC4 -eq 0 ] && [ $RC5 -eq 0 ]; then
-    printf '\033[1;32m✅ Done:\033[0m demo data loaded into Conjur.\n'
+    printf '\033[1;32m✅ Done:\033[0m demo data loaded into Secrets Manager.\n'
     printf '\033[1;33m➡️  Next:\033[0m run ./08.enable-k8s-jwt-authenticator.sh\n'
 else
     printf '\033[1;31m❌ Failed:\033[0m demo data load failed - check the output above.\n'

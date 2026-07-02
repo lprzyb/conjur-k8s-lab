@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Conjur K8s Lab - Demo Index</title>
+  <title>Secrets Manager K8s Lab - Demo Index</title>
   <style>
     body { font-family: sans-serif; max-width: 760px; margin: 40px auto; padding: 0 20px; background: #f8f9fa; color: #212529; }
     h1 { font-weight: 300; margin-bottom: 4px; }
@@ -28,7 +28,7 @@
   </style>
 </head>
 <body>
-  <h1>Conjur K8s Lab - Demo Index</h1>
+  <h1>Secrets Manager K8s Lab - Demo Index</h1>
   <p class="intro">Each link points at the port for that demo on whichever host you're browsing this page from. A link 404s/refuses to connect until you've deployed that step - that's expected, just come back once you have.</p>
   <p><a class="btn" href="matrix.html">&#8862; View all 7 demos at once - Rotation Matrix</a></p>
 
@@ -41,23 +41,23 @@
       </li>
       <li class="maintenance">
         <span class="badge">&#9881;</span>
-        <span class="label"><a data-port="443" data-scheme="https" href="#" target="_blank" rel="noopener noreferrer">Conjur Leader GUI</a><p>2.conjur-setup - admin console</p></span>
+        <span class="label"><a data-port="443" data-scheme="https" href="#" target="_blank" rel="noopener noreferrer">Secrets Manager Leader GUI</a><p>2.conjur-setup - admin console</p></span>
       </li>
       <li class="health">
         <span class="badge">&#9432;</span>
-        <span class="label"><a data-port="443" data-scheme="https" data-path="/info" href="#" target="_blank" rel="noopener noreferrer">Conjur Leader Info</a><p>2.conjur-setup - /info endpoint</p></span>
+        <span class="label"><a data-port="443" data-scheme="https" data-path="/info" href="#" target="_blank" rel="noopener noreferrer">Secrets Manager Leader Info</a><p>2.conjur-setup - /info endpoint</p></span>
       </li>
       <li class="health">
         <span class="badge">&#9432;</span>
-        <span class="label"><a data-port="30444" data-scheme="https" data-path="/info" href="#" target="_blank" rel="noopener noreferrer">Conjur Follower Info</a><p>2.conjur-setup - /info endpoint</p></span>
+        <span class="label"><a data-port="30444" data-scheme="https" data-path="/info" href="#" target="_blank" rel="noopener noreferrer">Secrets Manager Follower Info</a><p>2.conjur-setup - /info endpoint</p></span>
       </li>
       <li class="health">
         <span class="badge">&#10084;</span>
-        <span class="label"><a data-port="443" data-scheme="https" data-path="/health" href="#" target="_blank" rel="noopener noreferrer">Conjur Leader Health</a><p>2.conjur-setup - /health endpoint</p></span>
+        <span class="label"><a data-port="443" data-scheme="https" data-path="/health" href="#" target="_blank" rel="noopener noreferrer">Secrets Manager Leader Health</a><p>2.conjur-setup - /health endpoint</p></span>
       </li>
       <li class="health">
         <span class="badge">&#10084;</span>
-        <span class="label"><a data-port="30444" data-scheme="https" data-path="/health" href="#" target="_blank" rel="noopener noreferrer">Conjur Follower Health</a><p>2.conjur-setup - /health endpoint</p></span>
+        <span class="label"><a data-port="30444" data-scheme="https" data-path="/health" href="#" target="_blank" rel="noopener noreferrer">Secrets Manager Follower Health</a><p>2.conjur-setup - /health endpoint</p></span>
       </li>
     </ul>
   </details>
@@ -82,11 +82,11 @@
     </li>
     <li>
       <span class="badge">5</span>
-      <span class="label"><a data-port="30088" href="#" target="_blank" rel="noopener noreferrer">Spring Boot (Native SDK)</a><p>4.cityapp-springboot - app calls the Conjur API directly, no sidecar</p></span>
+      <span class="label"><a data-port="30088" href="#" target="_blank" rel="noopener noreferrer">Spring Boot (Native SDK)</a><p>4.cityapp-springboot - app calls the Secrets Manager API directly, no sidecar</p></span>
     </li>
     <li>
       <span class="badge">6</span>
-      <span class="label"><a data-port="30084" href="#" target="_blank" rel="noopener noreferrer">External Secrets Operator</a><p>5.conjur-eso - ESO syncs a Conjur secret into a native K8s Secret</p></span>
+      <span class="label"><a data-port="30084" href="#" target="_blank" rel="noopener noreferrer">External Secrets Operator</a><p>5.conjur-eso - ESO syncs a Secrets Manager secret into a native K8s Secret</p></span>
     </li>
     <li>
       <span class="badge">7</span>

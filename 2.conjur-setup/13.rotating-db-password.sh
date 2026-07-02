@@ -14,7 +14,7 @@ case "$MODE" in
         echo "Usage: $0 [host1|host2|all]"
         echo "  host1 (default): rotate the real MySQL password and update test/host1/pass only - test/host2/pass (cityapp-eso) is intentionally left stale, demonstrating what rotation costs an app pointed at the wrong variable."
         echo "  host2: sync test/host2/pass to test/host1/pass's CURRENT value - no new password, no MySQL change. Use this to repair cityapp-eso after a host1 rotation, without doing a fresh rotation."
-        echo "  all: rotate the real MySQL password and update both test/host1/pass and test/host2/pass together - every Conjur-integrated variant keeps working."
+        echo "  all: rotate the real MySQL password and update both test/host1/pass and test/host2/pass together - every Secrets Manager-integrated variant keeps working."
         exit 1
         ;;
 esac
@@ -27,7 +27,7 @@ esac
 # which apps need which). cityapp-eso reads the separate test/host2/* copy
 # (see 5.conjur-eso/01.adding-conjur-eso-policy.sh) and is intentionally
 # left behind here, right alongside cityapp-hardcode which never talks to
-# Conjur at all - both go stale, everything else survives the rotation.
+# Secrets Manager at all - both go stale, everything else survives the rotation.
 # Pass "host2" to repair just cityapp-eso afterward without a fresh
 # rotation, or "all" to rotate both together from the start.
 
@@ -93,12 +93,12 @@ set +x
 
 if [ $MYSQL_RC -eq 0 ] && [ $HOST1_RC -eq 0 ] && [ $HOST2_RC -eq 0 ]; then
     if [ "$MODE" = "all" ]; then
-        printf '\033[1;32m✅ Done:\033[0m %s password rotated in MySQL and updated in Conjur (test/host1/pass and test/host2/pass).\n' "$DB_USER"
-        printf '\033[1;33m➡️  Next:\033[0m cityapp-conjurtok8sfile and cityapp-conjurtok8ssecret refresh live within their secrets-refresh-interval, no redeploy needed. cityapp-springboot-sidecar (secret wired up as an env var, frozen at pod start), cityapp-springboot-native (fetches once via the Conjur SDK at startup) and cityapp-csi (rotation is not enabled on this lab'"'"'s CSI driver install) all need a redeploy to pick it up. cityapp-hardcode is the only one still stuck on the old password now, since it never talks to Conjur at all.\n'
+        printf '\033[1;32m✅ Done:\033[0m %s password rotated in MySQL and updated in Secrets Manager (test/host1/pass and test/host2/pass).\n' "$DB_USER"
+        printf '\033[1;33m➡️  Next:\033[0m cityapp-conjurtok8sfile and cityapp-conjurtok8ssecret refresh live within their secrets-refresh-interval, no redeploy needed. cityapp-springboot-sidecar (secret wired up as an env var, frozen at pod start), cityapp-springboot-native (fetches once via the Secrets Manager SDK at startup) and cityapp-csi (rotation is not enabled on this lab'"'"'s CSI driver install) all need a redeploy to pick it up. cityapp-hardcode is the only one still stuck on the old password now, since it never talks to Secrets Manager at all.\n'
     else
-        printf '\033[1;32m✅ Done:\033[0m %s password rotated in MySQL and updated in Conjur (test/host1/pass only - test/host2/pass left untouched on purpose).\n' "$DB_USER"
-        printf '\033[1;33m➡️  Next:\033[0m cityapp-conjurtok8sfile and cityapp-conjurtok8ssecret refresh live within their secrets-refresh-interval, no redeploy needed. cityapp-springboot-sidecar, cityapp-springboot-native and cityapp-csi need a redeploy to pick it up. cityapp-hardcode and cityapp-eso are now both stuck on the old password: hardcode because it never talks to Conjur at all, eso because it reads test/host2/* which this script left alone by default - run this script again with "host2" to repair just that, or "all" next time to rotate both together from the start.\n'
+        printf '\033[1;32m✅ Done:\033[0m %s password rotated in MySQL and updated in Secrets Manager (test/host1/pass only - test/host2/pass left untouched on purpose).\n' "$DB_USER"
+        printf '\033[1;33m➡️  Next:\033[0m cityapp-conjurtok8sfile and cityapp-conjurtok8ssecret refresh live within their secrets-refresh-interval, no redeploy needed. cityapp-springboot-sidecar, cityapp-springboot-native and cityapp-csi need a redeploy to pick it up. cityapp-hardcode and cityapp-eso are now both stuck on the old password: hardcode because it never talks to Secrets Manager at all, eso because it reads test/host2/* which this script left alone by default - run this script again with "host2" to repair just that, or "all" next time to rotate both together from the start.\n'
     fi
 else
-    printf '\033[1;31m❌ Failed:\033[0m password rotation failed partway through - check the output above. MySQL and Conjur may now be out of sync; do not leave it in this state, re-run once you have fixed the cause.\n'
+    printf '\033[1;31m❌ Failed:\033[0m password rotation failed partway through - check the output above. MySQL and Secrets Manager may now be out of sync; do not leave it in this state, re-run once you have fixed the cause.\n'
 fi
