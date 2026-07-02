@@ -42,6 +42,10 @@ spec:
             mountPath: /usr/share/nginx/html/index.html
             subPath: index.html
             readOnly: true
+          - name: landing-html
+            mountPath: /usr/share/nginx/html/matrix.html
+            subPath: matrix.html
+            readOnly: true
       volumes:
         - name: landing-html
           configMap:

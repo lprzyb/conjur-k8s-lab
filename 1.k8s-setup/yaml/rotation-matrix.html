@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Conjur K8s Lab - Rotation Matrix</title>
+  <style>
+    body { font-family: sans-serif; max-width: 1200px; margin: 40px auto; padding: 0 20px; background: #f8f9fa; color: #212529; }
+    h1 { font-weight: 300; margin-bottom: 4px; }
+    p.intro { color: #495057; }
+    .toolbar { display: flex; align-items: center; gap: 12px; margin: 16px 0 24px; }
+    .btn { display: inline-block; padding: 8px 16px; border-radius: 4px; text-decoration: none; color: #fff; background: #0d6efd; border: none; font-size: 1em; cursor: pointer; }
+    .btn:hover { background: #0b5ed7; }
+    .btn-link { background: #6c757d; }
+    .btn-link:hover { background: #5c636a; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .cell { background: #fff; border: 1px solid #dee2e6; border-left: 4px solid #0d6efd; border-radius: 6px; overflow: hidden; }
+    .cell-header { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid #dee2e6; }
+    .badge { flex: 0 0 auto; width: 24px; height: 24px; border-radius: 50%; background: #0d6efd; color: #fff; font-weight: bold; display: flex; align-items: center; justify-content: center; font-size: 0.85em; }
+    .cell-title { font-weight: bold; font-size: 0.95em; }
+    .cell-title span { display: block; font-weight: normal; color: #6c757d; font-size: 0.85em; }
+    .cell iframe { width: 100%; height: 340px; border: none; display: block; }
+  </style>
+</head>
+<body>
+  <h1>Conjur K8s Lab - Rotation Matrix</h1>
+  <p class="intro">All 7 cityapp demo variants at once - useful for watching PART IV's password rotation land (or not) across every method side by side. Each app also auto-refreshes itself every 30s.</p>
+
+  <div class="toolbar">
+    <button class="btn" onclick="refreshAll()">&#8635; Refresh All</button>
+    <a class="btn btn-link" href="index.html">&#8592; Back to Demo Index</a>
+  </div>
+
+  <div class="grid">
+    <div class="cell">
+      <div class="cell-header"><span class="badge">1</span><span class="cell-title">Hardcoded Credentials<span>3.cityapp-setup - :30080</span></span></div>
+      <iframe data-port="30080" src="about:blank"></iframe>
+    </div>
+    <div class="cell">
+      <div class="cell-header"><span class="badge">2</span><span class="cell-title">Push to File<span>3.cityapp-setup - :30081</span></span></div>
+      <iframe data-port="30081" src="about:blank"></iframe>
+    </div>
+    <div class="cell">
+      <div class="cell-header"><span class="badge">3</span><span class="cell-title">Push to K8s Secret<span>3.cityapp-setup - :30082</span></span></div>
+      <iframe data-port="30082" src="about:blank"></iframe>
+    </div>
+    <div class="cell">
+      <div class="cell-header"><span class="badge">4</span><span class="cell-title">Spring Boot (Sidecar)<span>3.cityapp-setup - :30083</span></span></div>
+      <iframe data-port="30083" src="about:blank"></iframe>
+    </div>
+    <div class="cell">
+      <div class="cell-header"><span class="badge">5</span><span class="cell-title">Spring Boot (Native SDK)<span>4.cityapp-springboot - :30088</span></span></div>
+      <iframe data-port="30088" src="about:blank"></iframe>
+    </div>
+    <div class="cell">
+      <div class="cell-header"><span class="badge">6</span><span class="cell-title">External Secrets Operator<span>5.conjur-eso - :30084</span></span></div>
+      <iframe data-port="30084" src="about:blank"></iframe>
+    </div>
+    <div class="cell">
+      <div class="cell-header"><span class="badge">7</span><span class="cell-title">Secrets Store CSI Driver<span>6.conjur-csi - :30086</span></span></div>
+      <iframe data-port="30086" src="about:blank"></iframe>
+    </div>
+  </div>
+
+  <script>
+    function urlFor(iframe) {
+      return 'http://' + location.hostname + ':' + iframe.dataset.port + '/';
+    }
+    function refreshAll() {
+      document.querySelectorAll('iframe[data-port]').forEach(function (f) {
+        f.src = urlFor(f);
+      });
+    }
+    refreshAll();
+  </script>
+</body>
+</html>
