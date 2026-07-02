@@ -26,8 +26,13 @@ if [ $? -eq 0 ]; then
 fi
 
 kubectl apply -f yaml/landing-page.yaml
+RC=$?
 
 set +x
 VM_IP=$(hostname -I | awk '{print $1}')
-printf '\033[1;32m✅ Done:\033[0m landing page deployed - browse http://%s:30001\n' "$VM_IP"
-printf '\033[1;33m➡️  Next:\033[0m cd ../2.conjur-setup and review 00.config.sh\n'
+if [ $RC -eq 0 ]; then
+    printf '\033[1;32m✅ Done:\033[0m landing page deployed - browse http://%s:30001\n' "$VM_IP"
+    printf '\033[1;33m➡️  Next:\033[0m cd ../2.conjur-setup and review 00.config.sh\n'
+else
+    printf '\033[1;31m❌ Failed:\033[0m landing page deployment failed (exit %s) - check the output above.\n' "$RC"
+fi

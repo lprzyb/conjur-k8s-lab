@@ -45,6 +45,10 @@ spec:
         image: registry.tld/conjur-appliance:CONJUR_VERSION
         command: ["/tmp/seedfile/start-follower.sh"]
         imagePullPolicy: IfNotPresent
+        securityContext:
+          capabilities:
+            add:
+              - AUDIT_WRITE
         env:
           - name: SEEDFILE_DIR
             value: /tmp/seedfile

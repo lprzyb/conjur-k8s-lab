@@ -31,8 +31,13 @@ sed -i "s/CONJUR_VERSION/$conjur_version/g" /tmp/follower.yaml
 sed -i "s/JWT_AUDIENCE/$JWT_AUDIENCE/g" /tmp/follower.yaml
 
 kubectl -n conjur apply -f /tmp/follower.yaml
+RC=$?
 
 rm /tmp/follower.yaml
 set +x
-printf '\033[1;32m✅ Done:\033[0m Conjur Follower deployed - browse https://%s:30444/info\n' "$CONJUR_IP"
-printf '\033[1;33m➡️  Next:\033[0m cd ../3.cityapp-setup and review 00.config.sh\n'
+if [ $RC -eq 0 ]; then
+    printf '\033[1;32m✅ Done:\033[0m Conjur Follower deployed - browse https://%s:30444/info\n' "$CONJUR_IP"
+    printf '\033[1;33m➡️  Next:\033[0m cd ../3.cityapp-setup and review 00.config.sh\n'
+else
+    printf '\033[1;31m❌ Failed:\033[0m Conjur Follower deployment failed (exit %s) - check the output above.\n' "$RC"
+fi

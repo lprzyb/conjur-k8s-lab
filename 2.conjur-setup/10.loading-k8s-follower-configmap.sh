@@ -21,7 +21,12 @@ kubectl -n conjur create configmap follower-cm \
     --from-literal CONJUR_SEED_FILE_URL=$CONJUR_SEED_FILE_URL \
     --from-literal AUTHENTICATOR_ID=$AUTHENTICATOR_ID \
     --from-literal "CONJUR_SSL_CERTIFICATE=${CONJUR_CERT}"
+RC=$?
 
 set +x
-printf '\033[1;32m✅ Done:\033[0m follower-cm configmap created.\n'
-printf '\033[1;33m➡️  Next:\033[0m run ./11.deploying-follower-k8s.sh\n'
+if [ $RC -eq 0 ]; then
+    printf '\033[1;32m✅ Done:\033[0m follower-cm configmap created.\n'
+    printf '\033[1;33m➡️  Next:\033[0m run ./11.deploying-follower-k8s.sh\n'
+else
+    printf '\033[1;31m❌ Failed:\033[0m follower-cm configmap creation failed (exit %s) - check the output above.\n' "$RC"
+fi

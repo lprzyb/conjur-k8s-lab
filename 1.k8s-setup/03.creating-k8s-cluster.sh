@@ -10,6 +10,7 @@ set -x
 
 kubeadm config images pull
 kubeadm init --pod-network-cidr 10.244.0.0/16
+RC=$?
 
 #Configure kubectl admin login and allow pods to run on master (single-node Kubernetes)
 mkdir -p $HOME/.kube
@@ -54,5 +55,9 @@ do
     ret=$?
 done
 set +x
-printf '\033[1;32m✅ Done:\033[0m standalone K8s cluster up with Flannel networking.\n'
-printf '\033[1;33m➡️  Next:\033[0m run ./04.installing-k8s-dashboard.sh\n'
+if [ $RC -eq 0 ]; then
+    printf '\033[1;32m✅ Done:\033[0m standalone K8s cluster up with Flannel networking.\n'
+    printf '\033[1;33m➡️  Next:\033[0m run ./04.installing-k8s-dashboard.sh\n'
+else
+    printf '\033[1;31m❌ Failed:\033[0m kubeadm init failed (exit %s) - check the output above.\n' "$RC"
+fi

@@ -22,9 +22,14 @@ podman run --name mysqldb -v $db_dir:/docker-entrypoint-initdb.d \
      -e MYSQL_USER=$DB_USER \
      -e MYSQL_PASSWORD=$DB_PASSWORD \
      -p "3306:3306" -d docker.io/library/mysql:8.4
+RC=$?
 
 grep -q "$DB_HOST" /etc/hosts || echo "$CONJUR_IP $DB_HOST" >> /etc/hosts
 set +x
-printf '\033[1;32m✅ Done:\033[0m MySQL container running with the demo world database.\n'
-printf '\033[1;33m➡️  Next:\033[0m run ./03.loading-conjur-images.sh\n'
+if [ $RC -eq 0 ]; then
+    printf '\033[1;32m✅ Done:\033[0m MySQL container running with the demo world database.\n'
+    printf '\033[1;33m➡️  Next:\033[0m run ./03.loading-conjur-images.sh\n'
+else
+    printf '\033[1;31m❌ Failed:\033[0m MySQL container failed to start (exit %s) - run "podman logs mysqldb" to see why.\n' "$RC"
+fi
 

@@ -43,6 +43,7 @@ EOF
 yum -y install kubelet kubeadm kubectl --disableexcludes=kubernetes
 systemctl enable kubelet
 systemctl start kubelet
+RC=$?
 
 #Configure firewall
 firewall-cmd --add-port 2379-2380/tcp --permanent
@@ -56,5 +57,9 @@ firewall-cmd --add-masquerade --permanent
 firewall-cmd --reload
 
 set +x
-printf '\033[1;32m✅ Done:\033[0m kubelet/kubeadm/kubectl installed.\n'
-printf '\033[1;33m➡️  Next:\033[0m run ./03.creating-k8s-cluster.sh\n'
+if [ $RC -eq 0 ]; then
+    printf '\033[1;32m✅ Done:\033[0m kubelet/kubeadm/kubectl installed.\n'
+    printf '\033[1;33m➡️  Next:\033[0m run ./03.creating-k8s-cluster.sh\n'
+else
+    printf '\033[1;31m❌ Failed:\033[0m kubelet install/start failed (exit %s) - check the output above.\n' "$RC"
+fi

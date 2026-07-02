@@ -18,7 +18,12 @@ EOF
 
 yum -y install cri-o
 systemctl enable --now crio
+RC=$?
 
 set +x
-printf '\033[1;32m✅ Done:\033[0m CRI-O installed and running.\n'
-printf '\033[1;33m➡️  Next:\033[0m run ./02.installing-k8s-and-tools.sh\n'
+if [ $RC -eq 0 ]; then
+    printf '\033[1;32m✅ Done:\033[0m CRI-O installed and running.\n'
+    printf '\033[1;33m➡️  Next:\033[0m run ./02.installing-k8s-and-tools.sh\n'
+else
+    printf '\033[1;31m❌ Failed:\033[0m CRI-O install/enable failed (exit %s) - check the output above.\n' "$RC"
+fi
