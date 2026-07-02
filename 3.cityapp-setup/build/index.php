@@ -77,12 +77,13 @@
 <html>
   <head>
     <meta http-equiv="refresh" content="30">
-    <link rel="icon" href="https://www.cyberark.com/wp-content/themes/understrap-child/favicon.ico">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%226%22 fill=%22%23212529%22/><text x=%2216%22 y=%2223%22 font-size=%2220%22 font-family=%22sans-serif%22 font-weight=%22bold%22 fill=%22%236cc24a%22 text-anchor=%22middle%22>A</text></svg>">
     <title>CyberArk Demo</title>
     <style>
       body { font-family: sans-serif; margin: 0; background: #f8f9fa; color: #212529; }
-      header { background: #212529; padding: 12px 20px; }
-      header img { height: 32px; }
+      header { background: #212529; padding: 14px 20px; }
+      .logo { color: #fff; font-size: 1.3em; font-weight: 700; letter-spacing: 0.02em; text-decoration: none; }
+      .logo span { color: #6cc24a; }
       main { max-width: 700px; margin: 0 auto; padding: 24px 20px; text-align: center; }
       h1 { font-weight: 300; }
       table { width: 100%; border-collapse: collapse; margin: 16px 0; }
@@ -98,7 +99,7 @@
   </head>
   <body>
     <header>
-      <img src="https://docs.cyberark.com/Product-Doc/OnlineHelp/Portal/Content/Resources/_TopNav/Images/Skin/lg-cyberark.svg">
+      <span class="logo">Cyber<span>Ark</span></span>
     </header>
     <main>
       <h1>CyberArk Integration Demo</h1>
