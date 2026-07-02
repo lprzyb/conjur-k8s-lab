@@ -317,22 +317,28 @@ Using command ```curl -k https://<VM-IP>:30444/info``` to check for follower det
 ...
 ```
 
-## **Step2.2.8: Linking the Leader to the Follower's health API**
-```
-./12.linking-leader-to-follower-health.sh
-```
+### A note on the Conjur Cluster page's "Unknown" Follower status
 The Follower's Services/Database/Free Space columns on the Conjur Cluster
-page (Step2.2.7 above) show "Unknown" out of the box - the Leader runs as a
-plain podman container outside the Kubernetes cluster, so it has no route to
-K8s's internal DNS and can't resolve the Follower's own hostname
-(```follower.conjur.svc.cluster.local```) to poll its ```/health``` endpoint
-directly. Routing to the Follower's Service ClusterIP already works fine
-(same host, same network); only the DNS lookup is missing. This script looks
-up the Follower Service's ClusterIP and adds a matching entry to the Leader
-container's ```/etc/hosts```, then verifies the health check succeeds.
-Re-run it any time the Follower Service is deleted/recreated and gets a new
-ClusterIP. Refresh ```seting>Conjur Cluster``` afterward to see the Follower
-row filled in.
+page (Step2.2.7 above) show "Unknown" out of the box, and its Domain Name
+column shows ```host.containers.internal``` instead of anything meaningful -
+this is expected for this lab's topology, not a bug, and the original repo's
+own reference screenshot shows the identical result.
+
+This lab configures a plain Leader + Follower replication setup
+(```05.configuring-conjur-leader.sh``` runs ```evoke configure leader``` with
+no ```--auto-failover```/etcd cluster flags), not Conjur Enterprise's separate
+Auto-Failover clustering feature - which is why the Leader's own row shows
+```Auto-failover: N/A``` too. The Follower's Services/Database/Free Space
+status specifically depends on Auto-Failover's etcd-based health-monitoring
+agent, which isn't configured here; its Replication status still shows real
+data because that comes from Postgres's own replication view, not the
+missing agent. The Domain Name/Host IP columns come from a reverse DNS
+lookup on the connection's source address rather than the node's own
+hostname - for the Follower that source is podman's own NAT gateway address
+(this lab runs the Leader and Follower on the same VM, so the Follower
+reaches the Leader via the VM's external IP, which loops back through
+podman's port-publishing NAT), the same class of artifact the page's own
+disclaimer describes for a load balancer.
 
 # PART III: TESTING CITYAPP OPTIONS
 # 3.1. Building cityapp image
