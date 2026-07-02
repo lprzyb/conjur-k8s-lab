@@ -13,43 +13,43 @@ stringData:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: cityapp-springboot
+  name: cityapp-springboot-sidecar
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: cityapp-springboot
+  name: cityapp-springboot-sidecar
   labels:
-    app: cityapp-springboot
+    app: cityapp-springboot-sidecar
 spec:
   ports:
   - port: 8080
-    nodePort: 30088
+    nodePort: 30083
     name: http
   selector:
-    app: cityapp-springboot
+    app: cityapp-springboot-sidecar
   type: NodePort
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: cityapp-springboot
-  name: cityapp-springboot
+    app: cityapp-springboot-sidecar
+  name: cityapp-springboot-sidecar
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: cityapp-springboot
+      app: cityapp-springboot-sidecar
   template:
     metadata:
       labels:
-        app: cityapp-springboot
+        app: cityapp-springboot-sidecar
       annotations:
         conjur.org/container-mode: sidecar
         conjur.org/secrets-refresh-interval: 30s
     spec:
-      serviceAccountName: cityapp-springboot
+      serviceAccountName: cityapp-springboot-sidecar
       hostAliases:
       - ip: "{LAB_IP}"
         hostnames:

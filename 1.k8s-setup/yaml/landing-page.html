@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Conjur K8s Lab - Demo Index</title>
+  <style>
+    body { font-family: sans-serif; max-width: 760px; margin: 40px auto; padding: 0 20px; background: #f8f9fa; color: #212529; }
+    h1 { font-weight: 300; margin-bottom: 4px; }
+    p.intro { color: #495057; }
+    h2 { font-size: 1.1em; text-transform: uppercase; letter-spacing: 0.05em; color: #495057; border-bottom: 2px solid #dee2e6; padding-bottom: 6px; margin-top: 36px; }
+    ul { list-style: none; padding: 0; }
+    li { display: flex; align-items: center; gap: 14px; background: #fff; border: 1px solid #dee2e6; border-left: 4px solid #0d6efd; border-radius: 6px; padding: 12px 16px; margin: 10px 0; transition: background 0.15s; }
+    li:hover { background: #eef4ff; }
+    li.maintenance { border-left-color: #6c757d; }
+    .badge { flex: 0 0 auto; width: 28px; height: 28px; border-radius: 50%; background: #0d6efd; color: #fff; font-weight: bold; display: flex; align-items: center; justify-content: center; font-size: 0.9em; }
+    li.maintenance .badge { background: #6c757d; }
+    .label a { font-weight: bold; text-decoration: none; color: #0d6efd; font-size: 1.05em; }
+    .label a:hover { text-decoration: underline; }
+    .label p { margin: 2px 0 0; color: #6c757d; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <h1>Conjur K8s Lab - Demo Index</h1>
+  <p class="intro">Each link points at the port for that demo on whichever host you're browsing this page from. A link 404s/refuses to connect until you've deployed that step - that's expected, just come back once you have.</p>
+
+  <h2>Maintenance</h2>
+  <ul>
+    <li class="maintenance">
+      <span class="badge">&#9881;</span>
+      <span class="label"><a data-port="30443" data-scheme="https" href="#">Kubernetes Dashboard</a><p>1.k8s-setup - cluster overview</p></span>
+    </li>
+    <li class="maintenance">
+      <span class="badge">&#9881;</span>
+      <span class="label"><a data-port="443" data-scheme="https" href="#">Conjur Leader GUI</a><p>2.conjur-setup - admin console</p></span>
+    </li>
+    <li class="maintenance">
+      <span class="badge">&#9881;</span>
+      <span class="label"><a data-port="30444" data-scheme="https" href="#">Conjur Follower</a><p>2.conjur-setup - /info endpoint</p></span>
+    </li>
+  </ul>
+
+  <h2>Demo Use Cases</h2>
+  <ul>
+    <li>
+      <span class="badge">1</span>
+      <span class="label"><a data-port="30080" href="#">Hardcoded Credentials</a><p>3.cityapp-setup - credentials as plain env vars</p></span>
+    </li>
+    <li>
+      <span class="badge">2</span>
+      <span class="label"><a data-port="30081" href="#">Push to File</a><p>3.cityapp-setup - Secrets Provider, push to file</p></span>
+    </li>
+    <li>
+      <span class="badge">3</span>
+      <span class="label"><a data-port="30082" href="#">Push to K8s Secret</a><p>3.cityapp-setup - Secrets Provider, push to k8s Secret</p></span>
+    </li>
+    <li>
+      <span class="badge">4</span>
+      <span class="label"><a data-port="30083" href="#">Spring Boot (Sidecar)</a><p>3.cityapp-setup - Secrets Provider sidecar, push to k8s Secret</p></span>
+    </li>
+    <li>
+      <span class="badge">5</span>
+      <span class="label"><a data-port="30088" href="#">Spring Boot (Native SDK)</a><p>4.cityapp-springboot - app calls the Conjur API directly, no sidecar</p></span>
+    </li>
+    <li>
+      <span class="badge">6</span>
+      <span class="label"><a data-port="30084" href="#">External Secrets Operator</a><p>5.conjur-eso - ESO syncs a Conjur secret into a native K8s Secret</p></span>
+    </li>
+    <li>
+      <span class="badge">7</span>
+      <span class="label"><a data-port="30086" href="#">Secrets Store CSI Driver</a><p>6.conjur-csi - CSI provider mounts secrets live, no sidecar</p></span>
+    </li>
+  </ul>
+
+  <script>
+    document.querySelectorAll('a[data-port]').forEach(function (a) {
+      var scheme = a.dataset.scheme || 'http';
+      a.href = scheme + '://' + location.hostname + ':' + a.dataset.port + '/';
+    });
+  </script>
+</body>
+</html>

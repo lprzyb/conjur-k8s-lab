@@ -1,0 +1,48 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: landing-page
+  labels:
+    app: landing-page
+spec:
+  ports:
+  - port: 80
+    nodePort: 30001
+    name: http
+  selector:
+    app: landing-page
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: landing-page
+  name: landing-page
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: landing-page
+  template:
+    metadata:
+      labels:
+        app: landing-page
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.30-alpine
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+          name: http
+        volumeMounts:
+          - name: landing-html
+            mountPath: /usr/share/nginx/html/index.html
+            subPath: index.html
+            readOnly: true
+      volumes:
+        - name: landing-html
+          configMap:
+            name: landing-page-html
