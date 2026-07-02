@@ -404,7 +404,7 @@ Using browser and go to ```http://<VM-IP>:30081``` to see the result
 ![cityapp](./images/11.cityapp-conjurtok8sfile.png)
 
 # 3.4. Running cityapp-conjurtok8ssecret
-Application cityapp-conjurtok8ssecret is configured with sidecar container (secrets-provider-for-k8s) which is run in the same pod with cityapp. The sidecar will connect to conjur follower pod, using jwt authentication method and check for database credentials. Information will then be pushed into kubernetes secret name ```db-creds``` which is configured in application's namespace (need RBAC configuration to allow update method on k8s secret). When cityapp's main container running, it will access to secret content via files in /etc/secret-volume which is the shared volume that is linked to secret ```db-creds```. The architecture of this method is described at below CyberArk document link.
+Application cityapp-conjurtok8ssecret runs a secrets-provider-for-k8s container in the same pod as cityapp (structurally a sidecar - listed under `containers:`, not `initContainers:` - unlike section 3.3's push-to-file variant). Its `CONTAINER_MODE` env var is explicitly set to `init`, though: it connects to the conjur follower pod using the jwt authentication method, fetches the database credentials, pushes them into kubernetes secret name ```db-creds``` (configured in the application's namespace, needs RBAC configuration to allow the update method on k8s secrets), then exits - it does not keep running to continuously refresh the secret. When cityapp's main container running, it will access to secret content via files in /etc/secret-volume which is the shared volume that is linked to secret ```db-creds```. The architecture of this method is described at below CyberArk document link.
 
 [CyberArk Secret Provider: Kubernetes Secret mode](https://docs.cyberark.com/Product-Doc/OnlineHelp/AAM-DAP/Latest/en/Content/Integrations/k8s-ocp/cjr-k8s-secrets-provider-ic.htm?tocpath=Integrations%7COpenShift%252FKubernetes%7CApp%20owner%253A%20Set%20up%20workloads%20in%20Kubernetes%7CSet%20up%20workloads%20(cert-based%20authn)%7CSecrets%20Provider%20for%20Kubernetes%7CInit%20container%252FSidecar%7C_____1 "Push to secret")
 
@@ -414,7 +414,7 @@ Application cityapp-conjurtok8ssecret is configured with sidecar container (secr
 ./04.running-cityapp-conjurtok8ssecret.sh
 ```
 
-In k8s dashboard's GUI, checking for sidecar's log in conjurtok8ssecret pod, the detail of conjur jwt authentication and secret pushing will be shown as below
+In k8s dashboard's GUI, checking for the conjurtok8ssecret container's log in the pod, the detail of conjur jwt authentication and secret pushing will be shown as below (since `CONTAINER_MODE=init`, this container exits after one successful run rather than running continuously)
 ```
 INFO:  2022/11/20 17:51:05.371062 main.go:62: CSPFK008I CyberArk Secrets Provider for Kubernetes v1.4.4-5f8218a starting up
 INFO:  2022/11/20 17:51:05.371238 main.go:226: CSPFK014I Authenticator setting DEBUG provided by environment

@@ -6,6 +6,22 @@ if [[ "$READY" != true ]]; then
     exit
 fi
 
+# This deployment reuses localhost/cityapp-springboot:latest, which only exists
+# if 4.cityapp-springboot/41.building-cityapp-image.sh has actually been run.
+SPRINGBOOT_READY=$(grep -E '^READY=' ../4.cityapp-springboot/00.config.sh | tail -1 | cut -d= -f2)
+podman image exists localhost/cityapp-springboot:latest
+IMAGE_EXISTS_RC=$?
+
+if [ $IMAGE_EXISTS_RC -ne 0 ]; then
+    printf '\033[1;31m❌ Cannot deploy:\033[0m localhost/cityapp-springboot:latest image not found.\n'
+    if [ "$SPRINGBOOT_READY" != true ]; then
+        printf '\033[1;33m➡️  Fix:\033[0m 4.cityapp-springboot/00.config.sh is not READY either - the app has not been built yet. cd ../4.cityapp-springboot, edit 00.config.sh, set READY=true, then run ./41.building-cityapp-image.sh before retrying this script.\n'
+    else
+        printf '\033[1;33m➡️  Fix:\033[0m 4.cityapp-springboot/00.config.sh is already READY, but the image still is not built. cd ../4.cityapp-springboot and run ./41.building-cityapp-image.sh before retrying this script.\n'
+    fi
+    exit 1
+fi
+
 APP_NAME="cityapp-springboot-sidecar"
 YML_FILE="yaml/$APP_NAME.yaml"
 YML_TEMP="/tmp/$APP_NAME.yaml"
