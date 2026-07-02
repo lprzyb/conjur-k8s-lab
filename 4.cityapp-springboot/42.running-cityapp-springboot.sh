@@ -6,7 +6,7 @@ if [[ "$READY" != true ]]; then
     exit
 fi
 
-APP_NAME="cityapp-springboot"
+APP_NAME="cityapp-springboot-native"
 YML_FILE="yaml/$APP_NAME.yaml"
 YML_TEMP="/tmp/$APP_NAME.yaml"
 

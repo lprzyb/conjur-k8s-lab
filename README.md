@@ -11,11 +11,11 @@ This project will help you to quickly build up the standalone, single VM lab env
 
 All setup, installing and configuration steps are all put in sequence of scripts to make the setup process quicker and easier
 
-Comments and question, please send to <huy.do@cyberark.com>
+### Credits
+This is an updated and polished fork of the original lab by Huy Do (huy.do@cyberark.com), based on the installing/configuration guide by Joe Tan (joe.tan@cyberark.com, https://github.com/joetanx). Kudos to both for the original work this builds on.
 
-Thanks and kudos to @Joe Tan (joe.tan@cyberark.com) for the detail of installing and configuration guide at https://github.com/joetanx
-
-### Video on step by step setting up this LAB is at https://youtu.be/qiXBtv5R1z4
+### Video on step by step setting up the original lab is at https://youtu.be/qiXBtv5R1z4
+(some details - script names, base OS, a few added demos - have since changed in this fork, but the core flow still applies)
 
 ### Keeping this lab current
 Run ```./check-versions.sh``` (needs ```curl``` and ```jq```) any time before rebuilding the lab to see which pinned image/chart/dependency versions are behind their current upstream release. It only reports drift - it never edits any file.
@@ -26,7 +26,7 @@ Run ```./check-versions.sh``` (needs ```curl``` and ```jq```) any time before re
   - 12GB RAM (minimum), recommended 16GB
   - 2 vCore CPU
   - 60GB HDD
-  - CentOS Stream 9 base OS (Minimal Install)
+  - Rocky Linux 9 base OS (Minimal Install)
     - Hostname: k8s.demo.local
     - LAN IP (eg 172.16.100.15/24)
     - Internet connection to do yum updating and packages installation
@@ -38,33 +38,63 @@ Run ```./check-versions.sh``` (needs ```curl``` and ```jq```) any time before re
  *The IP addresses in this document are using from current lab environment. Please replace the **172.16.100.109** by your actual **VM IP**’s
     
 # 1.2. VMs Preparation
-## **Step1.2.1: Preparing CentOS Stream 9**
-CentOS Stream 9 can be downloaded at https://www.centos.org/download/
+## **Step1.2.1: Preparing Rocky Linux 9**
+Rocky Linux 9 can be downloaded at https://rockylinux.org/download - grab the latest 9.x Minimal ISO.
 
 ![centos](./images/01.centos-download.png)
+
+*(screenshots below are from the original CentOS Stream 9-based walkthrough - the Rocky Linux download page and Anaconda installer look and work the same way, just rebranded)*
 
 Creating VM and installing with minimal install option
 
 ![minimal](./images/02.minimal-install.png)
 
-- Checking for IP, DNS and Internet connection
-- Installing git tool
+Once you're logged in to a freshly installed VM as root, a few one-liners before anything else:
 ```
-yum -y install git
+#Set the hostname the rest of this lab expects
+hostnamectl set-hostname k8s.demo.local
+
+#Update the base OS
+yum update -y
+
+#Install the handful of tools the setup scripts assume are already present
+#(openssl/tar/gzip ship with Minimal Install by default - listed for completeness)
+yum -y install git curl jq openssl
 ```
+Checking for IP, DNS and Internet connection
+```
+ip a
+ping -c1 8.8.8.8
+```
+
+Checking sshd allows both password and SSH key login (useful if you'll be connecting from more than one workstation, or don't have a key handy yet) - Rocky/RHEL 9 split sshd config across drop-in files under `/etc/ssh/sshd_config.d/`, so check the *effective* config rather than grepping `sshd_config` alone:
+```
+sshd -T | grep -iE "^(passwordauthentication|pubkeyauthentication)"
+```
+If either comes back other than `yes`, enable both explicitly and restart sshd:
+```
+sed -i 's/^#*PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+sed -i 's/^#*PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+grep -q "^PasswordAuthentication" /etc/ssh/sshd_config || echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
+grep -q "^PubkeyAuthentication" /etc/ssh/sshd_config || echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config
+systemctl restart sshd
+```
+Note this widens auth options (password login is more brute-forceable than key-only) - fine for an isolated lab VM, but worth being deliberate about if this VM is reachable beyond your own network.
 ## **Step1.2.2: Copying files for setting up**
 Login to VM as root, creating folder for setup_files
 ```
 mkdir -p /opt/lab/setup_files
-chmod 777 /opt/lab/setup_files
+chmod 755 /opt/lab/setup_files
 ```
 Copy conjur appliance image file to setup_files folder
-- Conjur docker image: conjur-appliance-Rls-12.7.tar.gz
+- Conjur docker image: conjur-appliance-Rls-v13.7.0.tar.gz (or whatever version you received from CyberArk)
 ## **Step1.2.3: Cloning git hub repo**
+This repo is private, so the VM needs GitHub auth first - either generate an SSH key on the VM and add it under [github.com/settings/keys](https://github.com/settings/keys), or clone over HTTPS with a personal access token instead.
+
 Login to VM as root and running below command
 ```
 cd /opt/lab
-git clone https://github.com/huydd79/conjur-k8s-lab
+git clone git@github.com:lprzyb/conjur-k8s-lab.git
 ```
 Installation folder contains 6 sub folders for different setup
 - 1.k8s-setup: scripts to setup k8s standalone cluster environment
@@ -136,6 +166,17 @@ https://<VMIP>:30443
 Select kube-system namespace and review some of the data in dashboard
 
 ![k8sd2](./images/04.k8s-dashboard2.png)
+
+## **Step2.1.5: Deploying the demo landing page**
+Login to VM as root, running below command
+```
+cd /opt/lab/conjur-k8s-lab/1.k8s-setup
+./05.deploying-landing-page.sh
+```
+Deploys a single static page (plain HTML/CSS, no JS framework) with links to every demo you'll deploy in the following parts. Open it now and keep the tab open - links to demos you haven't deployed yet just won't connect until you get there.
+```
+http://<VM-IP>:30001
+```
 
 # 2.2. Setting up podman and conjur environment
 ## **Step2.2.1: Reviewing 00.config.sh**
@@ -395,19 +436,21 @@ Set ```READY=true```, then build the image:
 This installs Java 17, runs the Maven build, and tags the result ```cityapp-springboot```. If the build tools aren't available it automatically falls back to pulling a prebuilt image instead, so this step always produces something usable either way.
 
 ## Step3.5.2: Deploying cityapp-springboot - two options
-Both options below deploy to the **same** namespace, Deployment/Service name (```cityapp-springboot```), and NodePort (```30088```) - they're alternatives, not simultaneous demos. Applying one replaces the other.
+Both options deploy the same image built above, but as separate Deployments/Services with their own NodePort, so you can run both side by side and compare them directly.
 
 **Option A - secrets-provider-for-k8s sidecar** (same mechanism as Step 3.3/3.4 above, just with the Java app instead of PHP):
 ```
 cd /opt/lab/conjur-k8s-lab/3.cityapp-setup
 ./06.running-cityapp-springboot.sh
 ```
+Using browser and go to ```http://<VM-IP>:30083``` to see the result.
 
 **Option B - native Conjur Spring Boot SDK** (the app itself calls the Conjur API directly at startup via `ConjurSpringDbConfig.java` - no sidecar, no secrets-provider-for-k8s):
 ```
 cd /opt/lab/conjur-k8s-lab/4.cityapp-springboot
 ./42.running-cityapp-springboot.sh
 ```
+Using browser and go to ```http://<VM-IP>:30088``` to see the result.
 
 Using browser and go to ```http://<VM-IP>:30088``` to see the result, whichever option you deployed.
 

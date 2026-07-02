@@ -6,7 +6,7 @@ if [[ "$READY" != true ]]; then
     exit
 fi
 
-APP_NAME="cityapp-springboot"
+APP_NAME="cityapp-springboot-sidecar"
 YML_FILE="yaml/$APP_NAME.yaml"
 YML_TEMP="/tmp/$APP_NAME.yaml"
 CONJUR_FOLLOWER_URL="https://follower.conjur.svc.cluster.local"

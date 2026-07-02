@@ -79,17 +79,23 @@
       authn-jwt/k8s/kubernetes.io/namespace: cityapp
       authn-jwt/k8s/kubernetes.io/serviceaccount/name: cityapp-conjurtok8ssecret
   - !host
-    id: system:serviceaccount:cityapp:cityapp-springboot
+    id: system:serviceaccount:cityapp:cityapp-springboot-sidecar
     annotations:
       authn-jwt/k8s/kubernetes.io/namespace: cityapp
-      authn-jwt/k8s/kubernetes.io/serviceaccount/name: cityapp-springboot
+      authn-jwt/k8s/kubernetes.io/serviceaccount/name: cityapp-springboot-sidecar
+  - !host
+    id: system:serviceaccount:cityapp:cityapp-springboot-native
+    annotations:
+      authn-jwt/k8s/kubernetes.io/namespace: cityapp
+      authn-jwt/k8s/kubernetes.io/serviceaccount/name: cityapp-springboot-native
   - !layer cityapp
   - !grant
     role: !layer cityapp
     members:
     - !host system:serviceaccount:cityapp:cityapp-conjurtok8sfile
     - !host system:serviceaccount:cityapp:cityapp-conjurtok8ssecret
-    - !host system:serviceaccount:cityapp:cityapp-springboot
+    - !host system:serviceaccount:cityapp:cityapp-springboot-sidecar
+    - !host system:serviceaccount:cityapp:cityapp-springboot-native
 
 # Give the Conjur Follower permission to authenticate to Conjur and to use the seed service using the JWT Authenticator endpoint.
 - !grant

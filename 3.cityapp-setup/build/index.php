@@ -63,11 +63,11 @@
   try
   {
     $pdo = new PDO($attr, $user, $pass, $opts);
-  
-    $query = "SELECT city.Name as City,country.name as Country,city.District,city.Population FROM city,country WHERE city.CountryCode = country.Code ORDER BY RAND() LIMIT 0,1";
+
+    $query = "SELECT city.Name as City,country.name as Country,city.District,city.Population FROM city,country WHERE city.CountryCode = country.Code ORDER BY RAND() LIMIT 0,5";
     $result = $pdo->query($query);
-    $row = $result->fetch();
-  
+    $rows = $result->fetchAll();
+
   }
   catch (PDOException $e)
   {
@@ -76,75 +76,65 @@
   ?>
 <html>
   <head>
+    <meta http-equiv="refresh" content="30">
     <link rel="icon" href="https://www.cyberark.com/wp-content/themes/understrap-child/favicon.ico">
     <title>CyberArk Demo</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <style>
+      body { font-family: sans-serif; margin: 0; background: #f8f9fa; color: #212529; }
+      header { background: #212529; padding: 12px 20px; }
+      header img { height: 32px; }
+      main { max-width: 700px; margin: 0 auto; padding: 24px 20px; text-align: center; }
+      h1 { font-weight: 300; }
+      table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+      th, td { padding: 6px 10px; border-bottom: 1px solid #dee2e6; text-align: left; }
+      .card { background: #fff; border: 1px solid #dee2e6; border-radius: 6px; padding: 16px; text-align: left; margin: 16px 0; }
+      .card p { margin: 4px 0; }
+      .error { color: #dc3545; font-weight: bold; }
+      .btn { display: inline-block; padding: 8px 16px; margin: 4px; border-radius: 4px; text-decoration: none; color: #fff; }
+      .btn-primary { background: #0d6efd; }
+      .btn-secondary { background: #6c757d; }
+      footer { text-align: center; color: #6c757d; padding: 16px; font-size: 0.9em; }
+    </style>
   </head>
   <body>
     <header>
-      <div class="navbar navbar-dark bg-dark shadow-sm">
-        <div class="container">
-          <img src="https://docs.cyberark.com/Product-Doc/OnlineHelp/Portal/Content/Resources/_TopNav/Images/Skin/lg-cyberark.svg">
-        </div>
-      </div>
+      <img src="https://docs.cyberark.com/Product-Doc/OnlineHelp/Portal/Content/Resources/_TopNav/Images/Skin/lg-cyberark.svg">
     </header>
     <main>
-      <section class="py-3 text-center container">
-        <div class="row py-lg-3">
-          <div class="col-lg-12 col-md-12 mx-auto">
-            <h1 class="fw-light">CyberArk Integration Demo</h1>
-            <p class="lead">&nbsp</p>
-            <h2 class="fw-light">Random World Cities!</h2>
-            <h3 class="fw-light">
-              <?php
-                if(empty($err_msg)){ 
-                  echo '<b>'.$row['City'].'</b> is a city in <b>'.$row['District'].'</b>, <b>'.$row['Country'].'</b> with a population of <b>'.$row['Population'].'</b>';
-                }else {
-                  echo '<b><font color=red>DB ERROR: '.$err_msg.'</b></font>';
-                }
-              ?>
-            </h3>
-            <p class="lead">&nbsp</p>
-            <div class="bg-light p-3 rounded col-lg-5 col-md-5 mx-auto">
-              <p class="lead">
-                <?php
-                  echo 'Host: <b>'.getenv('HOSTNAME').'</b>';
-                ?>
-              </p>
-              <p class="lead">
-                <?php
-                  echo 'Secret source: <b>'.$secrets_source.'</b>';
-                ?>
-              </p>
-              <p class="lead">
-                <?php
-                  echo 'Connected to database <b>'.$data .'</b> on <b>'.$host.'</b>:<b>'.$port.'</b>';
-                ?>
-              </p>
-              <p class="lead">
-                <?php
-                  echo 'Using username: <b>'.$user.'</b> and password: <b>'.$pass.'</b>';
-                ?>
-              </p>
-            </div>
-            <p class="lead">&nbsp</p>
-            <p>
-              <a href="https://docs.cyberark.com" class="btn btn-primary my-2">CyberArk Docs</a>
-              <a href="https://cyberark-customers.force.com/mplace/s/" class="btn btn-secondary my-2">CyberArk Marketplace</a>
-            </p>
-          </div>
-        </div>
-      </section>
-    </main>
-    <footer class="text-muted py-3">
-      <div class="container">
-        <p class="float-end mb-1">
-          <a href="#">Back to top</a>
-        </p>
-        <p class="mb-1">A CyberArk demo by Joe Tan <a href="mailto:joe.tan@cyberark.com">✉</a></p>
-        <p class="mb-1">Added push to k8s secret demo by Huy Do <a href="mailto:huy.do@cyberark.com">✉</a></p>
-        <p class="mb-0">Style by <a href="https://getbootstrap.com/">Bootstrap</a>.</p>
+      <h1>CyberArk Integration Demo</h1>
+      <h2>Random World Cities</h2>
+      <?php if(empty($err_msg)): ?>
+      <table>
+        <tr><th>City</th><th>District</th><th>Country</th><th>Population</th></tr>
+        <?php foreach($rows as $row): ?>
+        <tr>
+          <td><?php echo $row['City']; ?></td>
+          <td><?php echo $row['District']; ?></td>
+          <td><?php echo $row['Country']; ?></td>
+          <td><?php echo number_format($row['Population']); ?></td>
+        </tr>
+        <?php endforeach; ?>
+      </table>
+      <?php else: ?>
+      <p class="error">DB ERROR: <?php echo $err_msg; ?></p>
+      <?php endif; ?>
+
+      <div class="card">
+        <p>Host: <b><?php echo getenv('HOSTNAME'); ?></b></p>
+        <p>Secret source: <b><?php echo $secrets_source; ?></b></p>
+        <p>Connected to database <b><?php echo $data; ?></b> on <b><?php echo $host; ?></b>:<b><?php echo $port; ?></b></p>
+        <p>Using username: <b><?php echo $user; ?></b> and password: <b><?php echo $pass; ?></b></p>
+        <p>Last refreshed: <b><?php echo date('Y-m-d H:i:s'); ?></b> (auto-refreshes every 30s)</p>
       </div>
+
+      <p>
+        <a href="https://docs.cyberark.com" class="btn btn-primary">CyberArk Docs</a>
+        <a href="https://cyberark-customers.force.com/mplace/s/" class="btn btn-secondary">CyberArk Marketplace</a>
+      </p>
+    </main>
+    <footer>
+      <p>A CyberArk demo by Joe Tan (joe.tan@cyberark.com)</p>
+      <p>Added push to k8s secret demo by Huy Do (huy.do@cyberark.com)</p>
     </footer>
   </body>
 </html>
