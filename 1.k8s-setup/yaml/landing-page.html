@@ -8,6 +8,10 @@
     h1 { font-weight: 300; margin-bottom: 4px; }
     p.intro { color: #495057; }
     h2 { font-size: 1.1em; text-transform: uppercase; letter-spacing: 0.05em; color: #495057; border-bottom: 2px solid #dee2e6; padding-bottom: 6px; margin-top: 36px; }
+    details { margin-top: 36px; }
+    details summary { font-size: 1.1em; text-transform: uppercase; letter-spacing: 0.05em; color: #495057; border-bottom: 2px solid #dee2e6; padding-bottom: 6px; cursor: pointer; }
+    details summary:hover { color: #212529; }
+    details[open] summary { margin-bottom: 10px; }
     ul { list-style: none; padding: 0; }
     li { display: flex; align-items: center; gap: 14px; background: #fff; border: 1px solid #dee2e6; border-left: 4px solid #0d6efd; border-radius: 6px; padding: 12px 16px; margin: 10px 0; transition: background 0.15s; }
     li:hover { background: #eef4ff; }
@@ -25,33 +29,35 @@
   <h1>Conjur K8s Lab - Demo Index</h1>
   <p class="intro">Each link points at the port for that demo on whichever host you're browsing this page from. A link 404s/refuses to connect until you've deployed that step - that's expected, just come back once you have.</p>
 
-  <h2>Health &amp; Admin</h2>
-  <ul>
-    <li class="maintenance">
-      <span class="badge">&#9881;</span>
-      <span class="label"><a data-port="30443" data-scheme="https" href="#" target="_blank" rel="noopener noreferrer">Kubernetes Dashboard</a><p>1.k8s-setup - cluster overview</p></span>
-    </li>
-    <li class="maintenance">
-      <span class="badge">&#9881;</span>
-      <span class="label"><a data-port="443" data-scheme="https" href="#" target="_blank" rel="noopener noreferrer">Conjur Leader GUI</a><p>2.conjur-setup - admin console</p></span>
-    </li>
-    <li class="health">
-      <span class="badge">&#9432;</span>
-      <span class="label"><a data-port="443" data-scheme="https" data-path="/info" href="#" target="_blank" rel="noopener noreferrer">Conjur Leader Info</a><p>2.conjur-setup - /info endpoint</p></span>
-    </li>
-    <li class="health">
-      <span class="badge">&#9432;</span>
-      <span class="label"><a data-port="30444" data-scheme="https" data-path="/info" href="#" target="_blank" rel="noopener noreferrer">Conjur Follower Info</a><p>2.conjur-setup - /info endpoint</p></span>
-    </li>
-    <li class="health">
-      <span class="badge">&#10084;</span>
-      <span class="label"><a data-port="443" data-scheme="https" data-path="/health" href="#" target="_blank" rel="noopener noreferrer">Conjur Leader Health</a><p>2.conjur-setup - /health endpoint</p></span>
-    </li>
-    <li class="health">
-      <span class="badge">&#10084;</span>
-      <span class="label"><a data-port="30444" data-scheme="https" data-path="/health" href="#" target="_blank" rel="noopener noreferrer">Conjur Follower Health</a><p>2.conjur-setup - /health endpoint</p></span>
-    </li>
-  </ul>
+  <details>
+    <summary>Health &amp; Admin</summary>
+    <ul>
+      <li class="maintenance">
+        <span class="badge">&#9881;</span>
+        <span class="label"><a data-port="30443" data-scheme="https" href="#" target="_blank" rel="noopener noreferrer">Kubernetes Dashboard</a><p>1.k8s-setup - cluster overview</p></span>
+      </li>
+      <li class="maintenance">
+        <span class="badge">&#9881;</span>
+        <span class="label"><a data-port="443" data-scheme="https" href="#" target="_blank" rel="noopener noreferrer">Conjur Leader GUI</a><p>2.conjur-setup - admin console</p></span>
+      </li>
+      <li class="health">
+        <span class="badge">&#9432;</span>
+        <span class="label"><a data-port="443" data-scheme="https" data-path="/info" href="#" target="_blank" rel="noopener noreferrer">Conjur Leader Info</a><p>2.conjur-setup - /info endpoint</p></span>
+      </li>
+      <li class="health">
+        <span class="badge">&#9432;</span>
+        <span class="label"><a data-port="30444" data-scheme="https" data-path="/info" href="#" target="_blank" rel="noopener noreferrer">Conjur Follower Info</a><p>2.conjur-setup - /info endpoint</p></span>
+      </li>
+      <li class="health">
+        <span class="badge">&#10084;</span>
+        <span class="label"><a data-port="443" data-scheme="https" data-path="/health" href="#" target="_blank" rel="noopener noreferrer">Conjur Leader Health</a><p>2.conjur-setup - /health endpoint</p></span>
+      </li>
+      <li class="health">
+        <span class="badge">&#10084;</span>
+        <span class="label"><a data-port="30444" data-scheme="https" data-path="/health" href="#" target="_blank" rel="noopener noreferrer">Conjur Follower Health</a><p>2.conjur-setup - /health endpoint</p></span>
+      </li>
+    </ul>
+  </details>
 
   <h2>Demo Use Cases</h2>
   <ul>
