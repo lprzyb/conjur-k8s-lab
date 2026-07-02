@@ -7,9 +7,9 @@ if [[ "$READY" != true ]]; then
 fi
 
 set -x
-curl -s -Lo /usr/local/bin/conjur https://github.com/cyberark/conjur-cli-go/releases/latest/download/conjur_linux_amd64
+curl -s -Lo /usr/bin/conjur https://github.com/cyberark/conjur-cli-go/releases/latest/download/conjur_linux_amd64
 CURL_RC=$?
-chmod 755 /usr/local/bin/conjur
+chmod 755 /usr/bin/conjur
 conjur init self-hosted -u https://$CONJUR_LEADER_HOST -a $LAB_CONJUR_ACCOUNT -s
 conjur login -i admin
 LOGIN_RC=$?
