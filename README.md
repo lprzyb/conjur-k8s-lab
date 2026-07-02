@@ -34,6 +34,7 @@ Run ```./check-versions.sh``` (needs ```curl``` and ```jq```) any time before re
   - Contact CyberArk local representative for the appliance tarball (e.g. conjur-appliance-Rls-v13.7.0.tar.gz)
   - CyberArk softwares and related tools can be downloaded at https://cyberark-customers.force.com/mplace/s/#software
   - The Conjur CLI is installed automatically by ```2.conjur-setup/06.installing-conjur-cli.sh``` (downloads [conjur-cli-go](https://github.com/cyberark/conjur-cli-go) from GitHub) - no manual download needed
+- Java 17 (needed to build the Spring Boot cityapp in Part III.5 / ```4.cityapp-springboot```): saves time later to install it upfront with ```sudo dnf install -y java-17-openjdk java-17-openjdk-devel``` - not strictly required here, ```4.cityapp-springboot/41.building-cityapp-image.sh``` also installs it automatically if you skip this step
 
  *The IP addresses in this document are using from current lab environment. Please replace the **172.16.100.109** by your actual **VM IP**’s
     

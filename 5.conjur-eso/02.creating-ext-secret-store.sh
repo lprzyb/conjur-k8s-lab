@@ -31,9 +31,15 @@ sed -i "s#{JWT_AUDIENCE}#$JWT_AUDIENCE#g" $YML_TEMP
 
 kubectl -n $ESO_NS get secretstore | grep -q conjur && kubectl -n $ESO_NS delete secretstore conjur
 kubectl apply -n $ESO_NS -f $YML_TEMP
+RC=$?
 rm -rf $YML_TEMP
 
 kubectl -n $ESO_NS get secretstore -o json | jq
 
-
 set +x
+if [ $RC -eq 0 ]; then
+    printf '\033[1;32m✅ Done:\033[0m conjur SecretStore created in namespace %s.\n' "$ESO_NS"
+    printf '\033[1;33m➡️  Next:\033[0m run ./03.creating-eso-secret.sh\n'
+else
+    printf '\033[1;31m❌ Failed:\033[0m SecretStore creation failed (exit %s) - check the output above.\n' "$RC"
+fi

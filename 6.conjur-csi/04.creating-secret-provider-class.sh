@@ -45,9 +45,16 @@ done <<< "$CONJUR_CERT"
 set -x
 
 kubectl -n $OBJ_NS apply -f $YML_TEMP
+RC=$?
 
 rm -rf $YML_TEMP
 
 kubectl -n $OBJ_NS describe $OBJ_TYPE $OBJ_NAME
 
 set +x
+if [ $RC -eq 0 ]; then
+    printf '\033[1;32m✅ Done:\033[0m %s created in namespace %s.\n' "$OBJ_NAME" "$OBJ_NS"
+    printf '\033[1;33m➡️  Next:\033[0m run ./05.running-cityapp-csi-test.sh\n'
+else
+    printf '\033[1;31m❌ Failed:\033[0m SecretProviderClass creation failed (exit %s) - check the output above.\n' "$RC"
+fi

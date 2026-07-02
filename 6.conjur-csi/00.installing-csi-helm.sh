@@ -37,4 +37,13 @@ fi
 
 kubectl --namespace=kube-system get pods -l "app=secrets-store-csi-driver"
 
+helm list -n kube-system | grep -q csi-secrets-store
+CHART_RC=$?
+
 set +x
+if [ $CHART_RC -eq 0 ]; then
+    printf '\033[1;32m✅ Done:\033[0m Secrets Store CSI Driver Helm chart installed.\n'
+    printf '\033[1;33m➡️  Next:\033[0m run ./01.adding-conjur-csi-jwt-policy.sh\n'
+else
+    printf '\033[1;31m❌ Failed:\033[0m Secrets Store CSI Driver Helm chart is not installed - check the output above.\n'
+fi
