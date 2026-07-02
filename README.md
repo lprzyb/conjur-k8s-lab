@@ -317,6 +317,23 @@ Using command ```curl -k https://<VM-IP>:30444/info``` to check for follower det
 ...
 ```
 
+## **Step2.2.8: Linking the Leader to the Follower's health API**
+```
+./12.linking-leader-to-follower-health.sh
+```
+The Follower's Services/Database/Free Space columns on the Conjur Cluster
+page (Step2.2.7 above) show "Unknown" out of the box - the Leader runs as a
+plain podman container outside the Kubernetes cluster, so it has no route to
+K8s's internal DNS and can't resolve the Follower's own hostname
+(```follower.conjur.svc.cluster.local```) to poll its ```/health``` endpoint
+directly. Routing to the Follower's Service ClusterIP already works fine
+(same host, same network); only the DNS lookup is missing. This script looks
+up the Follower Service's ClusterIP and adds a matching entry to the Leader
+container's ```/etc/hosts```, then verifies the health check succeeds.
+Re-run it any time the Follower Service is deleted/recreated and gets a new
+ClusterIP. Refresh ```seting>Conjur Cluster``` afterward to see the Follower
+row filled in.
+
 # PART III: TESTING CITYAPP OPTIONS
 # 3.1. Building cityapp image
 ## **Step3.1.1: Reviewing 00.config.sh**
