@@ -25,3 +25,5 @@ podman run --name $node_name \
 grep -q "$CONJUR_LEADER_HOST" /etc/hosts || echo "$CONJUR_IP conjur1.$LAB_DOMAIN $CONJUR_LEADER_HOST" >> /etc/hosts
 
 set +x
+printf '\033[1;32m✅ Done:\033[0m Conjur container started.\n'
+printf '\033[1;33m➡️  Next:\033[0m run ./05.configuring-conjur-leader.sh\n'

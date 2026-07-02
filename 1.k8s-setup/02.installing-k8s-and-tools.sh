@@ -56,3 +56,5 @@ firewall-cmd --add-masquerade --permanent
 firewall-cmd --reload
 
 set +x
+printf '\033[1;32m✅ Done:\033[0m kubelet/kubeadm/kubectl installed.\n'
+printf '\033[1;33m➡️  Next:\033[0m run ./03.creating-k8s-cluster.sh\n'

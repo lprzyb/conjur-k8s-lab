@@ -14,3 +14,5 @@ conjur -d policy load -f ./policies/authn-jwt-k8s.yaml -b root
 podman exec -it $node_name sh -c 'grep -q "authn,authn-jwt/k8s" /opt/conjur/etc/conjur.conf || echo "CONJUR_AUTHENTICATORS=\"authn,authn-jwt/k8s\"\n">>/opt/conjur/etc/conjur.conf'
 podman exec $node_name sv restart conjur
 set +x
+printf '\033[1;32m✅ Done:\033[0m authn-jwt/k8s authenticator enabled.\n'
+printf '\033[1;33m➡️  Next:\033[0m run ./09.loading-conjur-jwt-data.sh\n'

@@ -19,3 +19,5 @@ podman exec $leaderContainer evoke configure $serverType \
     --leader-altnames "$clusterDNS,$standby1DNS" \
     -p $adminPass $accountName
 set +x
+printf '\033[1;32m✅ Done:\033[0m Conjur Leader configured - browse https://%s/\n' "$CONJUR_IP"
+printf '\033[1;33m➡️  Next:\033[0m run ./06.installing-conjur-cli.sh\n'

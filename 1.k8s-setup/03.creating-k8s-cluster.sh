@@ -52,5 +52,7 @@ do
     sleep 10
     ip address show dev cni0 | grep 10.244
     ret=$?
-done 
+done
 set +x
+printf '\033[1;32m✅ Done:\033[0m standalone K8s cluster up with Flannel networking.\n'
+printf '\033[1;33m➡️  Next:\033[0m run ./04.installing-k8s-dashboard.sh\n'

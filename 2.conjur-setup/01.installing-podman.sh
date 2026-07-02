@@ -12,3 +12,5 @@ sudo systemctl enable podman-restart.service
 sudo systemctl start podman-restart.service
 
 set +x
+printf '\033[1;32m✅ Done:\033[0m podman installed.\n'
+printf '\033[1;33m➡️  Next:\033[0m run ./02.running-mysql-db.sh\n'

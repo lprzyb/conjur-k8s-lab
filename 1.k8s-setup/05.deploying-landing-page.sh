@@ -28,3 +28,6 @@ fi
 kubectl apply -f yaml/landing-page.yaml
 
 set +x
+VM_IP=$(hostname -I | awk '{print $1}')
+printf '\033[1;32m✅ Done:\033[0m landing page deployed - browse http://%s:30001\n' "$VM_IP"
+printf '\033[1;33m➡️  Next:\033[0m cd ../2.conjur-setup and review 00.config.sh\n'

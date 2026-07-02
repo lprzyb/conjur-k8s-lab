@@ -45,3 +45,6 @@ kubectl -n kubernetes-dashboard describe secrets dashboard-admin-secret
 echo "Please copy above token value for dashboard login. Press enter when done..."
 read
 set +x
+VM_IP=$(hostname -I | awk '{print $1}')
+printf '\033[1;32m✅ Done:\033[0m K8s Dashboard deployed - browse https://%s:30443\n' "$VM_IP"
+printf '\033[1;33m➡️  Next:\033[0m run ./05.deploying-landing-page.sh\n'

@@ -25,4 +25,6 @@ podman run --name mysqldb -v $db_dir:/docker-entrypoint-initdb.d \
 
 grep -q "$DB_HOST" /etc/hosts || echo "$CONJUR_IP $DB_HOST" >> /etc/hosts
 set +x
+printf '\033[1;32m✅ Done:\033[0m MySQL container running with the demo world database.\n'
+printf '\033[1;33m➡️  Next:\033[0m run ./03.loading-conjur-images.sh\n'
 

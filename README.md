@@ -49,6 +49,12 @@ Creating VM and installing with minimal install option
 
 ![minimal](./images/02.minimal-install.png)
 
+**Every command in this README assumes an actual root shell**, not `sudo <command>` run one at a time as a regular user. If you installed with a personal admin account (e.g. one created on the Anaconda user-creation screen) rather than enabling direct root login, get a root shell once and stay there for the rest of the lab:
+```
+sudo -i
+```
+Running individual commands as `sudo <cmd>` from a non-root user instead of this will eventually hit a permission error somewhere downstream - e.g. `git clone` in Step1.2.3 failing to write into `/opt/lab` because only the `sudo`-prefixed commands were actually root, not the shell itself. `sudo -i` avoids that entirely.
+
 Once you're logged in to a freshly installed VM as root, a few one-liners before anything else:
 ```
 #Set the hostname the rest of this lab expects
@@ -81,7 +87,7 @@ systemctl restart sshd
 ```
 Note this widens auth options (password login is more brute-forceable than key-only) - fine for an isolated lab VM, but worth being deliberate about if this VM is reachable beyond your own network.
 ## **Step1.2.2: Copying files for setting up**
-Login to VM as root, creating folder for setup_files
+Create the setup_files folder:
 ```
 mkdir -p /opt/lab/setup_files
 chmod 755 /opt/lab/setup_files
@@ -90,8 +96,6 @@ Copy conjur appliance image file to setup_files folder
 - Conjur docker image: conjur-appliance-Rls-v13.7.0.tar.gz (or whatever version you received from CyberArk)
 ## **Step1.2.3: Cloning git hub repo**
 This repo is public, so no GitHub auth is needed to clone it.
-
-Login to VM as root and running below command
 ```
 cd /opt/lab
 git clone https://github.com/lprzyb/conjur-k8s-lab.git
@@ -124,32 +128,28 @@ This doesn't help the K8s Dashboard or the Conjur Follower's own endpoint - both
 # PART II: SETING UP CONJUR - K8S LAB
 # 2.1. Setting up K8s standalone cluster
 ## **Step2.1.0: Reviewing 00.config.sh**
-Login to VM as root, edit the 00.config.sh
 ```
 cd /opt/lab/conjur-k8s-lab/1.k8s-setup
 vi 00.config.sh
 ```
 Set ```K8S_VERSION``` to the Kubernetes/CRI-O minor version to install (e.g. ```v1.35```) and set ```READY=true``` to continue. CRI-O and kubelet/kubeadm/kubectl must use the same minor version.
+
 ## **Step2.1.1: Installing cri-o**
-Login to VM as root, running below command to install cri-o
 ```
-cd /opt/lab/conjur-k8s-lab/1.k8s-setup
 ./01.installing-cri-o.sh
 ```
 Checking crio service after done to make sure crio is up and run
 ```
 service crio status
 ```
+
 ## **Step2.1.2: Installing kubelet kubeadm and kubectl**
-Login to VM as root, running below command to install kubelet and tools
 ```
-cd /opt/lab/conjur-k8s-lab/1.k8s-setup
 ./02.installing-k8s-and-tools.sh
 ```
+
 ## **Step2.1.3: Setting up cluster and networking**
-Login to VM as root, running below command to create stand alone cluster and configure networking
 ```
-cd /opt/lab/conjur-k8s-lab/1.k8s-setup
 ./03.creating-k8s-cluster.sh 
 ```
 Make sure that cni0 interface is getting correct IP (in 10.244) before doing futher steps
@@ -161,10 +161,9 @@ Checking for the kubelet service status and cluster info
 service kubelet status
 kubectl get all
 ```
+
 ## **Step2.1.4: Setting up kubernetes dashboard**
-Login to VM as root, running below command to install kubernetes dashboard web GUI
 ```
-cd /opt/lab/conjur-k8s-lab/1.k8s-setup
 ./04.installing-k8s-dashboard.sh
 ```
 Copy the value of service account token to notepad for later usage. Checking status of k8s dashboard deployment
@@ -183,9 +182,7 @@ Select kube-system namespace and review some of the data in dashboard
 ![k8sd2](./images/04.k8s-dashboard2.png)
 
 ## **Step2.1.5: Deploying the demo landing page**
-Login to VM as root, running below command
 ```
-cd /opt/lab/conjur-k8s-lab/1.k8s-setup
 ./05.deploying-landing-page.sh
 ```
 Deploys a single static page (plain HTML/CSS, no JS framework) with links to every demo you'll deploy in the following parts. Open it now and keep the tab open - links to demos you haven't deployed yet just won't connect until you get there.
@@ -195,31 +192,27 @@ http://<VM-IP>:30001
 
 # 2.2. Setting up podman and conjur environment
 ## **Step2.2.1: Reviewing 00.config.sh**
-Login to VM as root, edit the 00.config.sh
 ```
 cd /opt/lab/conjur-k8s-lab/2.conjur-setup
 vi 00.config.sh
 ```
 Changed all related parameters such as IP, domain, password... and set ```READY=true``` to continue
+
 ## **Step2.2.2: Installing podman**
-Login to VM as root and running below commands
 ```
-cd /opt/lab/conjur-k8s-lab/2.conjur-setup
 ./01.installing-podman.sh
 ```
 Using ```podman image ls``` to check current podman images
+
 ## **Step2.2.3: Setting up mysql container and database**
-Login to VM as root and running below commands
 ```
-cd /opt/lab/conjur-k8s-lab/2.conjur-setup
 ./02.running-mysql-db.sh
 ```
 Using command ```podman container ls``` to make sure mysql container is up and running.
 Using command ```ping mysql.demo.local``` to make sure host entry has been added correctly
+
 ## **Step2.2.4: Installing conjur leader**
-Login to VM as root and running below commands
 ```
-cd /opt/lab/conjur-k8s-lab/2.conjur-setup
 ./03.loading-conjur-images.sh
 ./04.starting-conjur-container.sh
 ./05.configuring-conjur-leader.sh
@@ -238,9 +231,7 @@ https://<VM-IP>/
 ![conjurgui](./images/05.conjur-gui.png)
 
 ## **Step2.2.5: Installing conjur CLI**
-Login to VM as root and running below commands
 ```
-cd /opt/lab/conjur-k8s-lab/2.conjur-setup
 ./06.installing-conjur-cli.sh
 ```
 
@@ -249,9 +240,7 @@ The script installs the [conjur-cli-go](https://github.com/cyberark/conjur-cli-g
 Using command ```conjur whoami``` to doublecheck the result.
 
 ## **Step2.2.6: Loading demo data and enable conjur-k8s-jwt authentication**
-Login to VM as root and running below commands
 ```
-cd /opt/lab/conjur-k8s-lab/2.conjur-setup
 ./07.loading-demo-data.sh
 ./08.enable-k8s-jwt-authenticator.sh
 ```
@@ -280,7 +269,6 @@ Using ```curl -k https://conjur-leader.demo.local/info``` to see the authenticai
 ```
 Running below command to load jwt data to conjur environment
 ```
-cd /opt/lab/conjur-k8s-lab/2.conjur-setup
 ./09.loading-conjur-jwt-data.sh 
 ```
 Using browser, login to conjur GUI to review the demo data and content. Make sure all authn-jwt/k8s secrets got values
@@ -294,9 +282,7 @@ Using browser, login to conjur GUI to review the demo data and content. Make sur
 If any of above parameters is emply, please run script ```./09.loading-conjur-jwt-data.sh``` again.
 
 ## **Step2.2.7: Deploying conjur follower on k8s**
-Login to VM as root and running below commands
 ```
-cd /opt/lab/conjur-k8s-lab/2.conjur-setup
 ./10.loading-k8s-follower-configmap.sh 
 ./11.deploying-follower-k8s.sh 
 ```
@@ -334,27 +320,24 @@ Using command ```curl -k https://<VM-IP>:30444/info``` to check for follower det
 # PART III: TESTING CITYAPP OPTIONS
 # 3.1. Building cityapp image
 ## **Step3.1.1: Reviewing 00.config.sh**
-Login to VM as root, edit the 00.config.sh
 ```
 cd /opt/lab/conjur-k8s-lab/3.cityapp-setup
 vi 00.config.sh
 ```
 Changed all related parameters such as IP, domain... and set ```READY=true``` to continue
 ## **Step3.1.2: Building image**
-Login to VM as root, review the cityapp image detail on /opt/lab/conjur-k8s-lab/3.cityapp-setup/build
+Review the cityapp image detail on /opt/lab/conjur-k8s-lab/3.cityapp-setup/build
 - Dockerfile: contain building info
 - index.php: detail code of cityapp web application
+
 Running below command to build cityapp image
 ```
-cd /opt/lab/conjur-k8s-lab/3.cityapp-setup
 ./01.building-cityapp-image.sh
 ```
 Using command ```podman image ls | grep cityapp``` to make sure cityapp image has been build and put at localhost/cityapp
 
 # 3.2. Running cityapp-hardcode
-Login to VM as root, running below command to deploy cityapp-hardcode
 ```
-cd /opt/lab/conjur-k8s-lab/3.cityapp-setup
 ./02.running-cityapp-hardcode.sh
 ```
 Using browser and access to ```http://<VM-IP>:30080``` to open cityapp-hardcode webapp for the result
@@ -372,9 +355,8 @@ Application cityapp-conjurtok8sfile is configured with sidecar container (secret
 
 ![push2file](https://github.com/cyberark/secrets-provider-for-k8s/raw/main/assets/how-push-to-file-works.png)
 
-To deploy conjurtok8sfile application, login to VM as root, running below command
+To deploy conjurtok8sfile application, run:
 ```
-cd /opt/lab/conjur-k8s-lab/3.cityapp-setup
 ./03.running-cityapp-conjurtok8sfile.sh
 ```
 
@@ -405,9 +387,7 @@ Application cityapp-conjurtok8ssecret is configured with sidecar container (secr
 
 ![push2k8s](./images/cj-push2secrets.png)
 
-Login to VM as root, running below command to deploy conjurtok8ssecret
 ```
-cd /opt/lab/conjur-k8s-lab/3.cityapp-setup
 ./04.running-cityapp-conjurtok8ssecret.sh
 ```
 
@@ -439,7 +419,6 @@ Using browser and go to ```http://<VM-IP>:30082``` to see the result
 This is a Java/Spring Boot rewrite of cityapp, built from ```4.cityapp-springboot/build/``` (a Maven project). Its business logic and web page are the same as the PHP cityapp, but it can be deployed two different ways that are worth trying separately.
 
 ## Step3.5.1: Building the image
-Login to VM as root, running below command
 ```
 cd /opt/lab/conjur-k8s-lab/4.cityapp-springboot
 vi 00.config.sh
@@ -467,8 +446,6 @@ cd /opt/lab/conjur-k8s-lab/4.cityapp-springboot
 ```
 Using browser and go to ```http://<VM-IP>:30088``` to see the result.
 
-Using browser and go to ```http://<VM-IP>:30088``` to see the result, whichever option you deployed.
-
 # PART III-A: TESTING EXTERNAL SECRETS OPERATOR (ESO)
 Unlike the sidecar-based variants above, this section shows secrets flowing into Kubernetes from *outside* the pod entirely: the External Secrets Operator (ESO) authenticates to Conjur on its own and syncs a value into a native Kubernetes Secret, and the app that consumes it needs no Conjur awareness at all - no sidecar, no ServiceAccount, no JWT token.
 
@@ -481,7 +458,6 @@ Set ```READY=true``` to continue - this folder reuses the same ```2.conjur-setup
 
 ## Step3A.2: Installing ESO
 ```
-cd /opt/lab/conjur-k8s-lab/5.conjur-eso
 ./00.installing-eso-helm.sh
 ```
 Installs Helm if missing, then the ```external-secrets``` Helm chart into its own namespace.

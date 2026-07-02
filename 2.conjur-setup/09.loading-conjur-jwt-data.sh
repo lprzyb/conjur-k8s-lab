@@ -17,3 +17,5 @@ conjur variable set -i conjur/authn-jwt/k8s/identity-path -v jwt-apps/k8s
 conjur variable set -i conjur/authn-jwt/k8s/audience -v $JWT_AUDIENCE
 
 set +x
+printf '\033[1;32m✅ Done:\033[0m JWT authenticator data loaded into Conjur.\n'
+printf '\033[1;33m➡️  Next:\033[0m run ./10.loading-k8s-follower-configmap.sh\n'

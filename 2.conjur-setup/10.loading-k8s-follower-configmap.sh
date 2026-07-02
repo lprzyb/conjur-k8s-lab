@@ -23,3 +23,5 @@ kubectl -n conjur create configmap follower-cm \
     --from-literal "CONJUR_SSL_CERTIFICATE=${CONJUR_CERT}"
 
 set +x
+printf '\033[1;32m✅ Done:\033[0m follower-cm configmap created.\n'
+printf '\033[1;33m➡️  Next:\033[0m run ./11.deploying-follower-k8s.sh\n'

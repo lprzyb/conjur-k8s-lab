@@ -20,3 +20,5 @@ yum -y install cri-o
 systemctl enable --now crio
 
 set +x
+printf '\033[1;32m✅ Done:\033[0m CRI-O installed and running.\n'
+printf '\033[1;33m➡️  Next:\033[0m run ./02.installing-k8s-and-tools.sh\n'
