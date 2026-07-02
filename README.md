@@ -562,5 +562,8 @@ Creates a ```SecretProviderClass``` named ```conjur-credentials``` in the ```cit
 Deploys ```cityapp-csi```, mounting secrets via the CSI volume at ```/etc/secret-volume``` (resolved from ```test/host1/*```, the same working demo credentials used since Part II). Using browser and go to ```http://<VM-IP>:30086``` to see the result.
 
 # PART IV: FINAL TESTING
-Login to conjur GUI, change the value of secret ```test/host1/user```, ``` test/host1/pass``` and wait for 30 seconds. Refeshing the cityapp webpages to see if the credential values can be changed
+Run ```2.conjur-setup/13.rotating-db-password.sh```. It changes the actual MySQL password for the demo DB user and updates ```test/host1/pass``` in Conjur to match - deliberately leaving ```test/host2/pass``` untouched. Refresh each cityapp webpage after ~30 seconds to see how each method actually handles a rotated credential:
+- ```cityapp-conjurtok8ssecret``` (30082) and ```cityapp-csi``` (30086) pick it up live, no redeploy needed.
+- ```cityapp-conjurtok8sfile``` (30081), ```cityapp-springboot-sidecar``` (30083) and ```cityapp-springboot-native``` (30088) only fetch the secret at pod startup - redeploy those to see the new password.
+- ```cityapp-hardcode``` (30080) and ```cityapp-eso``` (30084) are left showing a DB connection error: hardcode because it never talks to Conjur at all, eso because it reads ```test/host2/*```, which the script leaves alone on purpose. This is the actual payoff of the whole lab - a live side-by-side of what a credential rotation costs you with each method.
 # --- LAB END ---
