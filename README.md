@@ -106,6 +106,21 @@ Installation folder contains 6 sub folders for different setup
 
 Each folder will have ```00.config.sh``` which contains some parameters. Review file content, change all related parameters to actual value and set ```READY=true``` before doing further steps.
 
+# 1.3. (Optional) DNS / hosts file on your workstation
+Browsing straight to ```http://<VM-IP>:PORT``` (as the rest of this README does) always works, no setup needed. But the Conjur Leader's TLS certificate is issued for ```conjur-leader.demo.local``` and ```conjur.demo.local``` (its ```-h```/```--leader-altnames``` in ```2.conjur-setup/05.configuring-conjur-leader.sh```), not for its IP - so visiting ```https://<VM-IP>/``` shows an extra "hostname mismatch" warning on top of the expected "self-signed, untrusted" one. Mapping the hostname on your own workstation clears that up. As a bonus, the landing page's links auto-adapt to whatever hostname you used to reach it (see ```1.k8s-setup/yaml/landing-page.html```) - visit it via ```k8s.demo.local``` and every link it generates will use that name too, instead of the raw IP.
+
+Add to your workstation's hosts file (```/etc/hosts``` on macOS/Linux, ```C:\Windows\System32\drivers\etc\hosts``` on Windows, admin/root privileges required) or your lab's DNS server if you have one:
+```
+<VM-IP>  k8s.demo.local
+<VM-IP>  conjur-leader.demo.local
+<VM-IP>  conjur.demo.local
+```
+Replace ```<VM-IP>``` with your actual VM IP (```CONJUR_IP``` in ```2.conjur-setup/00.config.sh```). If you changed ```LAB_DOMAIN``` away from the ```demo.local``` default, use that value instead throughout.
+
+This doesn't help the K8s Dashboard or the Conjur Follower's own endpoint - both present generic self-signed certs not bound to any particular hostname, so you'll still see the "untrusted" warning there regardless of how you address them.
+
+*macOS note: ```.local``` names are also handled by Bonjour/mDNS - a static hosts file entry still takes priority, but if you ever see stale/conflicting resolution, that's why.*
+
 # PART II: SETING UP CONJUR - K8S LAB
 # 2.1. Setting up K8s standalone cluster
 ## **Step2.1.0: Reviewing 00.config.sh**
