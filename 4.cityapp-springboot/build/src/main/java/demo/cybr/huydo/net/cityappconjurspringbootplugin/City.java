@@ -29,4 +29,9 @@ public class City
     public String ShowContent (){
         return "<b>" + city + "</b> is a city in <b>" + district + "</b>, <b>" + country + "</b> with population of <b>" + population + "</b>";
     }
+
+    public String getCity () { return city; }
+    public String getDistrict () { return district; }
+    public String getCountry () { return country; }
+    public Integer getPopulation () { return population; }
 }

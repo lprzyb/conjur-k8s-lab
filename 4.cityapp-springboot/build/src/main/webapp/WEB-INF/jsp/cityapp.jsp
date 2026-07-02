@@ -1,84 +1,87 @@
 <!DOCTYPE html>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <html>
   <head>
-    <link rel="icon" href="https://www.cyberark.com/wp-content/themes/understrap-child/favicon.ico">
+    <meta http-equiv="refresh" content="30">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%226%22 fill=%22%23212529%22/><text x=%2216%22 y=%2223%22 font-size=%2220%22 font-family=%22sans-serif%22 font-weight=%22bold%22 fill=%22%236cc24a%22 text-anchor=%22middle%22>A</text></svg>">
     <title>CyberArk Demo</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <style>
+      body { font-family: sans-serif; margin: 0; background: #f8f9fa; color: #212529; }
+      header { background: #212529; padding: 14px 20px; }
+      .logo { color: #fff; font-size: 1.3em; font-weight: 700; letter-spacing: 0.02em; text-decoration: none; }
+      .logo span { color: #6cc24a; }
+      main { max-width: 700px; margin: 0 auto; padding: 24px 20px; text-align: center; }
+      h1 { font-weight: 300; }
+      table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+      th, td { padding: 6px 10px; border-bottom: 1px solid #dee2e6; text-align: left; }
+      .card { background: #fff; border: 1px solid #dee2e6; border-radius: 6px; padding: 16px; text-align: left; margin: 16px 0; }
+      .card p { margin: 4px 0; }
+      .error { color: #dc3545; font-weight: bold; }
+      .btn { display: inline-block; padding: 8px 16px; margin: 4px; border-radius: 4px; text-decoration: none; color: #fff; }
+      .btn-primary { background: #0d6efd; }
+      .btn-secondary { background: #6c757d; }
+      footer { text-align: center; color: #6c757d; padding: 16px; font-size: 0.9em; }
+    </style>
   </head>
   <body>
     <header>
-      <div class="navbar navbar-dark bg-dark shadow-sm">
-        <div class="container">
-          <img src="https://docs.cyberark.com/Product-Doc/OnlineHelp/Portal/Content/Resources/_TopNav/Images/Skin/lg-cyberark.svg">
-        </div>
-      </div>
+      <span class="logo">Cyber<span>Ark</span></span>
     </header>
     <main>
-      <section class="py-3 text-center container">
-        <div class="row py-lg-3">
-          <div class="col-lg-12 col-md-12 mx-auto">
-            <h1 class="fw-light">CyberArk Integration: CityApp SpringBoot Demo</h1>
-            <p class="lead">&nbsp</p>
-            <h2 class="fw-light">Random World Cities!</h2>
-            <h3 class="fw-light">
-              <c:if test="${!empty cities}">
-                ${cities.get(0).ShowContent()}
-              </c:if>
-              <c:if test="${empty cities}">
-                <b><font color=red>ERROR: Query is empty</b></font>
-              </c:if>
-            </h3>
-            <%
-              String conjur = System.getenv("CONJUR_APPLIANCE_URL");
-              String secretSource = "";
-              String dbuser = "";
-              String dbpass = "";
-              if (conjur==null ){
-                secretSource = "ENVIRONMENT";
-                dbuser = System.getenv("DB_USER");
-                dbpass = System.getenv("DB_PASS");
-              } else {
-                secretSource = "CONJUR: " + conjur;
-                dbuser = "getting from " + System.getenv("CONJUR_MAPPING_DB_USER");
-                dbpass = "getting from " + System.getenv("CONJUR_MAPPING_DB_PASS");
-              }
-            %>
-            <p class="lead">&nbsp</p>
-            <div class="bg-light p-3 rounded col-lg-5 col-md-5 mx-auto">
-              <p class="lead">
-                  Host: <b><% out.print(System.getenv("HOSTNAME")); %></b>
-              </p>
-              <p class="lead">
-                Secret source: <b><% 
-                    out.print(secretSource); %></b>
-                </p>
-              <p class="lead">
-                Connected to database <b><% out.print(System.getenv("DB_NAME")); %></b> on <b><% out.print(System.getenv("DB_HOST")); %></b>:<b><% out.print(System.getenv("DB_PORT")); %></b>
-              </p>
-              <p class="lead">
-                Using username: <b><% out.print(dbuser); %></b> and password: <b><% out.print(dbpass); %></b>
-              </p>
-            </div>
-            <p class="lead">&nbsp</p>
-            <p>
-              <a href="https://docs.cyberark.com" class="btn btn-primary my-2">CyberArk Docs</a>
-              <a href="https://cyberark-customers.force.com/mplace/s/" class="btn btn-secondary my-2">CyberArk Marketplace</a>
-            </p>
-          </div>
-        </div>
-      </section>
-    </main>
-    <footer class="text-muted py-3">
-      <div class="container">
-        <p class="float-end mb-1">
-          <a href="#">Back to top</a>
-        </p>
-        <p class="mb-1">A CyberArk demo by Joe Tan <a href="mailto:joe.tan@cyberark.com">&#128231;</a></p>
-        <p class="mb-1">Converting to SpringBoot by Huy Do <a href="mailto:huy.do@cyberark.com"> &#x1F4E7;</a></p>
-        <p class="mb-0">Style by <a href="https://getbootstrap.com/">Bootstrap</a>.</p>
+      <h1>CyberArk Integration: CityApp SpringBoot Demo</h1>
+      <h2>Random World Cities</h2>
+      <c:if test="${!empty cities}">
+      <table>
+        <tr><th>City</th><th>District</th><th>Country</th><th>Population</th></tr>
+        <c:forEach items="${cities}" var="c">
+        <tr>
+          <td>${c.city}</td>
+          <td>${c.district}</td>
+          <td>${c.country}</td>
+          <td><fmt:formatNumber value="${c.population}"/></td>
+        </tr>
+        </c:forEach>
+      </table>
+      </c:if>
+      <c:if test="${empty cities}">
+      <p class="error">DB ERROR: Query is empty</p>
+      </c:if>
+
+      <%
+        String conjur = System.getenv("CONJUR_APPLIANCE_URL");
+        String secretSource;
+        String dbuser;
+        String dbpass;
+        String dbHostDisplay;
+        if (conjur == null) {
+          secretSource = "ENVIRONMENT";
+          dbuser = System.getenv("DB_USER");
+          dbpass = System.getenv("DB_PASS");
+          dbHostDisplay = System.getenv("DB_HOST") + ":" + System.getenv("DB_PORT");
+        } else {
+          secretSource = "CONJUR: " + conjur;
+          dbuser = "getting from " + System.getenv("CONJUR_MAPPING_DB_USER");
+          dbpass = "getting from " + System.getenv("CONJUR_MAPPING_DB_PASS");
+          dbHostDisplay = "resolved via Conjur SDK at startup";
+        }
+      %>
+      <div class="card">
+        <p>Host: <b><%= System.getenv("HOSTNAME") %></b></p>
+        <p>Secret source: <b><%= secretSource %></b></p>
+        <p>Connected to database <b><%= System.getenv("DB_NAME") %></b> on <b><%= dbHostDisplay %></b></p>
+        <p>Using username: <b><%= dbuser %></b> and password: <b><%= dbpass %></b></p>
       </div>
+
+      <p>
+        <a href="https://docs.cyberark.com" class="btn btn-primary">CyberArk Docs</a>
+        <a href="https://cyberark-customers.force.com/mplace/s/" class="btn btn-secondary">CyberArk Marketplace</a>
+      </p>
+    </main>
+    <footer>
+      <p>A CyberArk demo by Joe Tan (joe.tan@cyberark.com)</p>
+      <p>Converting to SpringBoot by Huy Do (huy.do@cyberark.com)</p>
     </footer>
   </body>
 </html>
