@@ -13,7 +13,6 @@ podman stop $node_name
 podman container rm $(podman ps -a | grep $node_name | awk '{print $1}')
 podman run --name $node_name \
   -d --restart=always \
-  --dns $CONJUR_IP \
   -p "443:443" -p "636:636" -p "5432:5432" -p "1999:1999" \
   --security-opt seccomp:unconfined \
   --cap-add AUDIT_WRITE \
