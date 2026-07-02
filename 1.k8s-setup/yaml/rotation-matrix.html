@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <title>Conjur K8s Lab - Rotation Matrix</title>
   <style>
-    body { font-family: sans-serif; max-width: 1200px; margin: 40px auto; padding: 0 20px; background: #f8f9fa; color: #212529; }
+    body { font-family: sans-serif; max-width: 1800px; width: 95%; margin: 40px auto; padding: 0 20px; background: #f8f9fa; color: #212529; }
     h1 { font-weight: 300; margin-bottom: 4px; }
     p.intro { color: #495057; }
-    .toolbar { display: flex; align-items: center; gap: 12px; margin: 16px 0 24px; }
+    .toolbar { display: flex; align-items: center; gap: 12px; margin: 24px 0 40px; }
     .btn { display: inline-block; padding: 8px 16px; border-radius: 4px; text-decoration: none; color: #fff; background: #0d6efd; border: none; font-size: 1em; cursor: pointer; }
     .btn:hover { background: #0b5ed7; }
     .btn-link { background: #6c757d; }
@@ -24,11 +24,6 @@
 <body>
   <h1>Conjur K8s Lab - Rotation Matrix</h1>
   <p class="intro">All 7 cityapp demo variants at once - useful for watching PART IV's password rotation land (or not) across every method side by side. Each app also auto-refreshes itself every 30s.</p>
-
-  <div class="toolbar">
-    <button class="btn" onclick="refreshAll()">&#8635; Refresh All</button>
-    <a class="btn btn-link" href="index.html">&#8592; Back to Demo Index</a>
-  </div>
 
   <div class="grid">
     <div class="cell">
@@ -59,6 +54,11 @@
       <div class="cell-header"><span class="badge">7</span><span class="cell-title">Secrets Store CSI Driver<span>6.conjur-csi - :30086</span></span></div>
       <iframe data-port="30086" src="about:blank"></iframe>
     </div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn" onclick="refreshAll()">&#8635; Refresh All</button>
+    <a class="btn btn-link" href="index.html">&#8592; Back to Demo Index</a>
   </div>
 
   <script>
