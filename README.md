@@ -89,12 +89,12 @@ chmod 755 /opt/lab/setup_files
 Copy conjur appliance image file to setup_files folder
 - Conjur docker image: conjur-appliance-Rls-v13.7.0.tar.gz (or whatever version you received from CyberArk)
 ## **Step1.2.3: Cloning git hub repo**
-This repo is private, so the VM needs GitHub auth first - either generate an SSH key on the VM and add it under [github.com/settings/keys](https://github.com/settings/keys), or clone over HTTPS with a personal access token instead.
+This repo is public, so no GitHub auth is needed to clone it.
 
 Login to VM as root and running below command
 ```
 cd /opt/lab
-git clone git@github.com:lprzyb/conjur-k8s-lab.git
+git clone https://github.com/lprzyb/conjur-k8s-lab.git
 ```
 Installation folder contains 6 sub folders for different setup
 - 1.k8s-setup: scripts to setup k8s standalone cluster environment
