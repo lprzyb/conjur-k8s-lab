@@ -168,8 +168,7 @@
       </p>
     </main>
     <footer>
-      <p>An Idira demo by Joe Tan (joe.tan@cyberark.com)</p>
-      <p>Added push to k8s secret demo by Huy Do (huy.do@cyberark.com)</p>
+      <p>An Idira demo by Luke Przybylski (lprzybylski@paloaltonetworks.com), inspired by Joe Tan and Huy Do.</p>
     </footer>
   </body>
 </html>

@@ -33,7 +33,7 @@ Run ```./check-versions.sh``` (needs ```curl``` and ```jq```) any time before re
     - LAN IP (eg 172.16.100.15/24)
     - Internet connection to do yum updating and packages installation
 - Secrets Manager appliance image:
-  - Contact Idira local representative for the appliance tarball (e.g. conjur-appliance-Rls-v13.7.0.tar.gz)
+  - Contact Idira local representative for the appliance tarball (e.g. conjur-appliance-Rls-v13.9.0.tar.gz)
   - Idira softwares and related tools can be downloaded at https://cyberark-customers.force.com/mplace/s/#software
   - The Secrets Manager CLI is installed automatically by ```2.conjur-setup/06.installing-conjur-cli.sh``` (downloads [conjur-cli-go](https://github.com/cyberark/conjur-cli-go) from GitHub) - no manual download needed
 - Java 17 (needed to build the Spring Boot cityapp in Part III.5 / ```4.cityapp-springboot```): saves time later to install it upfront with ```sudo dnf install -y java-17-openjdk java-17-openjdk-devel``` - not strictly required here, ```4.cityapp-springboot/41.building-cityapp-image.sh``` also installs it automatically if you skip this step
@@ -96,7 +96,7 @@ mkdir -p /opt/lab/setup_files
 chmod 755 /opt/lab/setup_files
 ```
 Copy Secrets Manager appliance image file to setup_files folder
-- Secrets Manager docker image: conjur-appliance-Rls-v13.7.0.tar.gz (or whatever version you received from Idira)
+- Secrets Manager docker image: conjur-appliance-Rls-v13.9.0.tar.gz (or whatever version you received from Idira)
 ## **Step1.2.3: Cloning git hub repo**
 This repo is public, so no GitHub auth is needed to clone it.
 ```
