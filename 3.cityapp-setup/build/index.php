@@ -73,6 +73,31 @@
   {
     $err_msg=$e->getMessage();
   }
+
+  $demo_methods =
+  [
+    'hardcode' => [
+      'title' => 'Hardcoded Environment Variables',
+      'blurb' => 'The DB password is a plain Kubernetes env var on the Deployment spec - visible to anyone who can read the pod spec or exec into the container. This is the baseline every other method here improves on.',
+    ],
+    'push-to-file' => [
+      'title' => 'Conjur Secrets Provider: Push-to-File',
+      'blurb' => 'An init container authenticates to Conjur with a JWT service account token, fetches the secret, and writes it to an in-memory volume as a JSON file the app reads at startup.',
+    ],
+    'push-to-k8s-secret' => [
+      'title' => 'Conjur Secrets Provider: Push-to-K8s-Secret',
+      'blurb' => 'Same Secrets Provider mechanism as push-to-file, but it writes the fetched value into a native Kubernetes Secret object instead - so any RBAC-permitted workload can consume it the standard k8s way.',
+    ],
+    'eso' => [
+      'title' => 'External Secrets Operator (ESO)',
+      'blurb' => 'ESO syncs the Conjur secret into a native Kubernetes Secret on a schedule, entirely outside this pod. The app itself has zero Conjur awareness - no ServiceAccount, no JWT, no sidecar.',
+    ],
+    'csi' => [
+      'title' => 'Secrets Store CSI Driver',
+      'blurb' => 'The Secrets Store CSI Driver mounts the secret live as a volume at pod startup, authenticating on the driver\'s behalf via an explicit identity - no JWT token is projected into this pod at all.',
+    ],
+  ];
+  $demo_method = $demo_methods[getenv('DEMO_METHOD')] ?? null;
   ?>
 <html>
   <head>
@@ -90,6 +115,9 @@
       th, td { padding: 6px 10px; border-bottom: 1px solid #dee2e6; text-align: left; }
       .card { background: #fff; border: 1px solid #dee2e6; border-radius: 6px; padding: 16px; text-align: left; margin: 16px 0; }
       .card p { margin: 4px 0; }
+      .card.story { border-left: 4px solid #6cc24a; }
+      .card.story h3 { margin: 0 0 6px; }
+      .card.story p { margin: 0; color: #495057; }
       .error { color: #dc3545; font-weight: bold; }
       .btn { display: inline-block; padding: 8px 16px; margin: 4px; border-radius: 4px; text-decoration: none; color: #fff; }
       .btn-primary { background: #0d6efd; }
@@ -118,6 +146,13 @@
       </table>
       <?php else: ?>
       <p class="error">DB ERROR: <?php echo $err_msg; ?></p>
+      <?php endif; ?>
+
+      <?php if($demo_method): ?>
+      <div class="card story">
+        <h3><?php echo htmlspecialchars($demo_method['title']); ?></h3>
+        <p><?php echo htmlspecialchars($demo_method['blurb']); ?></p>
+      </div>
       <?php endif; ?>
 
       <div class="card">

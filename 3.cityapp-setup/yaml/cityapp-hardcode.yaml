@@ -45,6 +45,8 @@ spec:
         imagePullPolicy: IfNotPresent
         name: cityapp
         env:
+          - name: DEMO_METHOD
+            value: hardcode
           - name: DBADDR
             value: '{DB_HOST}'
           - name: DBUSER

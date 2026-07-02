@@ -55,6 +55,9 @@ spec:
       - name: cityapp
         image: localhost/cityapp:php
         imagePullPolicy: IfNotPresent
+        env:
+          - name: DEMO_METHOD
+            value: push-to-file
         volumeMounts:
           - name: conjur-secrets
             mountPath: /conjur

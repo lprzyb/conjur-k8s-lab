@@ -42,6 +42,9 @@ spec:
       - name: cityapp
         image: localhost/cityapp:php
         imagePullPolicy: IfNotPresent
+        env:
+          - name: DEMO_METHOD
+            value: eso
         volumeMounts:
           - name: secret-volume
             mountPath: /etc/secret-volume

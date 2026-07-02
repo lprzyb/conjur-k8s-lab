@@ -49,6 +49,9 @@ spec:
       - image: localhost/cityapp:php
         imagePullPolicy: IfNotPresent
         name: cityapp
+        env:
+          - name: DEMO_METHOD
+            value: csi
         volumeMounts:
         - name: conjur-csi-volume
           mountPath: /etc/secret-volume
