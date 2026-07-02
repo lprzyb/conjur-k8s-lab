@@ -84,6 +84,12 @@ spec:
           value: '3306'
         - name: DB_NAME
           value: world
+        - name: CONJUR_MAPPING_DB_HOST
+          value: ''
+        - name: CONJUR_MAPPING_DB_USER
+          value: ''
+        - name: CONJUR_MAPPING_DB_PASS
+          value: ''
       - name: conjurtok8ssecret
         image: docker.io/cyberark/secrets-provider-for-k8s:1.10.0
         imagePullPolicy: IfNotPresent
