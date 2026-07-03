@@ -191,8 +191,6 @@ Deploys a single static page (plain HTML/CSS, no JS framework) with links to eve
 http://<VM-IP>:30001
 ```
 
-![landingpage](./images/05.landing-page-idira.png)
-
 ![landingpagedemo](./images/05.landing-page-demo-idira.png)
 
 # 2.2. Setting up podman and Secrets Manager environment
@@ -245,7 +243,6 @@ The script installs the [conjur-cli-go](https://github.com/cyberark/conjur-cli-g
 Using command ```conjur whoami``` to doublecheck the result.
 
 ## **Step2.2.6: Loading demo data and enable conjur-k8s-jwt authentication**
-![jwtauthnflow](./images/15.k8s-jwt-authn-flow.png)
 ```
 ./07.loading-demo-data.sh
 ./08.enable-k8s-jwt-authenticator.sh
@@ -347,6 +344,10 @@ podman's port-publishing NAT), the same class of artifact the page's own
 disclaimer describes for a load balancer.
 
 # PART III: TESTING CITYAPP OPTIONS
+Every demo scenario from here through Part IV is one of the links on the landing page deployed in Part II - shown below for convenience, so you can jump between demos without scrolling back and forth. That's optional though: every step below also gives its own standalone URL, which works whether or not you ever open the landing page.
+
+![landingpage](./images/05.landing-page-idira.png)
+
 # 3.1. Building cityapp image
 ## **Step3.1.1: Reviewing 00.config.sh**
 ```
@@ -483,7 +484,7 @@ Using browser and go to ```http://<VM-IP>:30088``` to see the result.
 ![cityappspringbootnative](./images/13.cityapp-springboot-native-idira.png)
 
 # PART III-A: TESTING EXTERNAL SECRETS OPERATOR (ESO)
-Unlike the sidecar-based variants above, this section shows secrets flowing into Kubernetes from *outside* the pod entirely: the External Secrets Operator (ESO) authenticates to Secrets Manager on its own and syncs a value into a native Kubernetes Secret, and the app that consumes it needs no Secrets Manager awareness at all - no sidecar, no ServiceAccount, no JWT token.
+Unlike the sidecar-based variants above, this section shows secrets flowing into Kubernetes from *outside* the pod entirely: the [External Secrets Operator](https://external-secrets.io/latest/) (ESO) authenticates to Secrets Manager on its own and syncs a value into a native Kubernetes Secret, and the app that consumes it needs no Secrets Manager awareness at all - no sidecar, no ServiceAccount, no JWT token.
 
 ## Step3A.1: Reviewing 00.config.sh
 ```
@@ -531,7 +532,7 @@ Deploys the same ```cityapp``` PHP image built in Part III, unmodified, mounting
 ![cityappeso](./images/14.cityapp-eso-idira.png)
 
 # PART III-B: TESTING THE CONJUR CSI PROVIDER
-A third way to deliver secrets into a pod: the Kubernetes Secrets Store CSI Driver mounts them directly as a volume, resolved live by IDIRA's Secrets Manager CSI provider at mount time. The provider authenticates using an explicit identity rather than auto-resolving one from JWT claims, so - like ESO - the app itself needs no ServiceAccount token projection, sidecar, or Secrets Manager awareness.
+A third way to deliver secrets into a pod: the [Kubernetes Secrets Store CSI Driver](https://kubernetes-csi.github.io/docs/) mounts them directly as a volume, resolved live by IDIRA's Secrets Manager CSI provider at mount time. The provider authenticates using an explicit identity rather than auto-resolving one from JWT claims, so - like ESO - the app itself needs no ServiceAccount token projection, sidecar, or Secrets Manager awareness.
 
 ## Step3B.1: Reviewing 00.config.sh
 ```
@@ -608,15 +609,54 @@ Deploys ```cityapp-summon``` with the authenticator sidecar. Using browser and g
 
 ![cityappsummon](./images/16.cityapp-k8s-jwt-authn-summon-idira.png)
 
+This is the same JWT authentication flow used by every variant since Part II (a projected ServiceAccount token, exchanged for a Secrets Manager access token) - the diagram below traces the full path, from the authenticator sidecar's token all the way to Summon injecting the fetched secret into cityapp's environment.
+
+![jwtauthnflow](./images/15.k8s-jwt-authn-flow.png)
+
 # PART IV: FINAL TESTING
-Run ```2.conjur-setup/13.rotating-db-password.sh``` (equivalent to ```2.conjur-setup/13.rotating-db-password.sh host1```). It changes the actual MySQL password for the demo DB user and updates ```test/host1/pass``` in Secrets Manager to match - deliberately leaving ```test/host2/pass``` untouched. Refresh each cityapp webpage after ~30-60 seconds to see how each method actually handles a rotated credential:
-- ```cityapp-conjurtok8sfile``` (30081) and ```cityapp-conjurtok8ssecret``` (30082) pick it up live, no redeploy needed - the secrets-provider sidecar keeps refreshing the file/Secret it writes to, and both apps read that shared volume fresh on every page load.
-- ```cityapp-conjurtok8ssecret-init``` (30085), ```cityapp-springboot-sidecar``` (30083), ```cityapp-springboot-native``` (30088), ```cityapp-csi``` (30086) and ```cityapp-summon``` (30087) need a redeploy: conjurtok8ssecret-init's Secrets Provider runs as a true initContainer, so it fetches ```db-creds``` once, to completion, before cityapp ever starts, with no ongoing process to refresh it afterward; springboot-sidecar's DB password is wired up as a `secretKeyRef` env var, which Kubernetes captures once at pod start and never live-updates even though the same sidecar keeps the underlying Secret current; springboot-native fetches once via the Secrets Manager SDK at startup with no refresh loop; this lab's CSI driver install doesn't enable secret rotation, so the mounted volume is fetched once too; and Summon fetches once and ```exec```s into cityapp's own process, so there's no Summon process left running afterward to refetch anything.
-- ```cityapp-hardcode``` (30080) and ```cityapp-eso``` (30084) are left showing a DB connection error: hardcode because it never talks to Secrets Manager at all, eso because it reads ```test/host2/*```, which the script leaves alone on purpose. This is the actual payoff of the whole lab - a live side-by-side of what a credential rotation costs you with each method.
+This is the actual payoff of the whole lab: rotate the real database password once, and watch each of the 9 integration methods handle it differently - some update live, some need a redeploy, and two are deliberately left broken. It's done in up to three steps, but most people only need the first one.
 
-To bring ```cityapp-eso``` back afterward without doing a fresh rotation, run ```2.conjur-setup/13.rotating-db-password.sh host2``` - it copies ```test/host1/pass```'s current value into ```test/host2/pass``` (no MySQL change, since the password itself hasn't changed). Or run ```2.conjur-setup/13.rotating-db-password.sh all``` next time to rotate MySQL and update both ```test/host1/pass``` and ```test/host2/pass``` together in one step, leaving only ```cityapp-hardcode``` stuck on the old password.
-
-Rather than tab-switching between all 9 demo URLs to watch the rotation land, open the rotation matrix (linked from the bottom of the landing page, or directly at ```http://<VM-IP>:30001/matrix.html```) - it embeds every cityapp variant side by side in one page, with a "Refresh All" button.
+## Step4.1: Rotate the real password (test/host1/*)
+```
+cd /opt/lab/conjur-k8s-lab/2.conjur-setup
+./13.rotating-db-password.sh
+```
+Changes the actual MySQL password and updates ```test/host1/pass``` in Secrets Manager - ```test/host2/pass``` is deliberately left untouched (see Step4.2). Refresh each cityapp page after ~30-60 seconds, or open the rotation matrix below to watch all of them at once:
+```
+http://<VM-IP>:30001/matrix.html
+```
 
 ![rotationmatrix](./images/16.rotation-page-idira.png)
+
+| App | Port | After rotation |
+|---|---|---|
+| cityapp-conjurtok8sfile | 30081 | ✅ Live - no redeploy needed |
+| cityapp-conjurtok8ssecret | 30082 | ✅ Live - no redeploy needed |
+| cityapp-conjurtok8ssecret-init | 30085 | 🔁 Needs a redeploy |
+| cityapp-springboot-sidecar | 30083 | 🔁 Needs a redeploy |
+| cityapp-springboot-native | 30088 | 🔁 Needs a redeploy |
+| cityapp-csi | 30086 | 🔁 Needs a redeploy |
+| cityapp-summon | 30087 | 🔁 Needs a redeploy |
+| cityapp-hardcode | 30080 | ❌ Broken - by design, see below |
+| cityapp-eso | 30084 | ❌ Broken until Step4.2 or Step4.3 |
+
+<details>
+<summary>Why does each app behave this way?</summary>
+
+- **Live, no redeploy**: both read the secret from a shared volume (a file or a K8s Secret) that the secrets-provider sidecar keeps refreshing on its own interval - the app just reads whatever's currently there on every page load.
+- **Needs a redeploy**: each of these fetches the secret exactly once and has no ongoing refresh process afterward, just for different reasons per method - ```conjurtok8ssecret-init```'s Secrets Provider is a true initContainer that exits after running once; ```springboot-sidecar```'s password is wired up as a `secretKeyRef` **env var**, which Kubernetes captures once at pod start even though the sidecar keeps the underlying Secret current; ```springboot-native``` fetches once via the Secrets Manager SDK at Spring startup; this lab's CSI driver install doesn't have secret rotation enabled, so the mounted volume is fetched once at mount time; and Summon fetches once, then ```exec```s into cityapp's own process, leaving nothing running afterward to refetch anything.
+- **Broken by design**: ```cityapp-hardcode``` never talks to Secrets Manager at all, so it can never see a rotated password. ```cityapp-eso``` reads ```test/host2/*```, a separate copy of the credentials that Step4.1 intentionally does not touch - see Step4.2 to repair it.
+</details>
+
+## Step4.2 (optional): Repair cityapp-eso
+```
+./13.rotating-db-password.sh host2
+```
+No new password, no MySQL change - just copies ```test/host1/pass```'s current value into ```test/host2/pass```. ```cityapp-eso``` picks it up on its own ESO sync schedule.
+
+## Step4.3 (alternative to Step4.1 + Step4.2): Rotate both together
+```
+./13.rotating-db-password.sh all
+```
+Same MySQL rotation as Step4.1, but updates ```test/host1/pass``` and ```test/host2/pass``` together in one step - only ```cityapp-hardcode``` is left stuck on the old password.
 # --- LAB END ---
