@@ -2,6 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%226%22 fill=%22%23212529%22/><text x=%2216%22 y=%2223%22 font-size=%2220%22 font-family=%22sans-serif%22 font-weight=%22bold%22 fill=%22%230d6efd%22 text-anchor=%22middle%22>I</text></svg>">
   <title>Secrets Manager K8s Lab - Demo Index</title>
   <style>
     body { font-family: sans-serif; max-width: 760px; margin: 40px auto; padding: 0 20px; background: #f8f9fa; color: #212529; }
@@ -31,7 +32,6 @@
 <body>
   <h1>Secrets Manager K8s Lab - Demo Index</h1>
   <p class="intro">Each link points at the port for that demo on whichever host you're browsing this page from. A link 404s/refuses to connect until you've deployed that step - that's expected, just come back once you have.</p>
-  <p><a class="btn" href="matrix.html">&#8862; View all 7 demos at once - Rotation Matrix</a></p>
 
   <details>
     <summary>Health &amp; Admin</summary>
@@ -41,8 +41,8 @@
         <span class="label"><a data-port="30443" data-scheme="https" href="#" target="_blank" rel="noopener noreferrer">Kubernetes Dashboard</a><p>1.k8s-setup - cluster overview</p></span>
       </li>
       <li class="maintenance">
-        <span class="badge">&#9881;</span>
-        <span class="label"><a data-port="443" data-scheme="https" href="#" target="_blank" rel="noopener noreferrer">Secrets Manager Leader GUI</a><p>2.conjur-setup - admin console</p></span>
+        <span class="badge">&#128100;</span>
+        <span class="label"><a data-port="443" data-scheme="https" href="#" target="_blank" rel="noopener noreferrer">Secrets Manager Admin Portal</a><p>2.conjur-setup - admin console</p></span>
       </li>
       <li class="health">
         <span class="badge">&#9432;</span>
@@ -103,8 +103,10 @@
     });
   </script>
 
+  <p><a class="btn" href="matrix.html">&#8862; View all 7 demos at once - Rotation Matrix</a></p>
+
   <footer>
-    <p>An Idira demo by Luke Przybylski (lprzybylski@paloaltonetworks.com), inspired by Joe Tan and Huy Do.</p>
+    <p>An IDIRA demo by Luke Przybylski (lprzybylski@paloaltonetworks.com), inspired by Joe Tan and Huy Do.</p>
   </footer>
 </body>
 </html>

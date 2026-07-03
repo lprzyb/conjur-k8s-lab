@@ -107,7 +107,7 @@ pinned "Kubernetes Dashboard" "$dash_current" "capped at v2 - v3 needs Helm+cert
 # --- 2.conjur-setup --------------------------------------------------------
 
 appliance_current=$(grep -m1 '^conjur_version=' 2.conjur-setup/00.config.sh | cut -d= -f2)
-report "Secrets Manager appliance" "$appliance_current" "" "licensed download - check the Idira portal manually"
+report "Secrets Manager appliance" "$appliance_current" "" "licensed download - check the IDIRA portal manually"
 
 seedfetcher_current=$(grep -oE "dap-seedfetcher:[0-9.]+" 2.conjur-setup/follower/follower.yaml | cut -d: -f2)
 seedfetcher_latest=$(dockerhub_tags cyberark/dap-seedfetcher | grep -E '^[0-9]+\.[0-9]+$' | sort -t. -k1,1n -k2,2n | tail -1)

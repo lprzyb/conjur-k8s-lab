@@ -15,7 +15,7 @@ CONJUR_LEADER_HOST=conjur-leader.$LAB_DOMAIN
 DB_HOST=mysql.$LAB_DOMAIN
 #Path to folder with all docker images
 UPLOAD_DIR=/opt/lab/setup_files
-#Example only - confirm the exact filename/version against what you downloaded from Idira
+#Example only - confirm the exact filename/version against what you downloaded from IDIRA
 conjur_appliance_file=conjur-appliance-Rls-v13.9.0.tar.gz
 conjur_version=13.9.0
 #Secrets Manager container name

@@ -1,5 +1,5 @@
-# Building standalone Idira Secrets Manager Enterprise and K8s LAB
-*(Idira Secrets Manager was formerly known as CyberArk Conjur - this README uses the current names throughout, except where quoting real filenames, URLs, CLI commands, or literal program output that still use the older "Conjur"/"CyberArk" names.)*
+# Building standalone IDIRA Secrets Manager Enterprise and K8s LAB
+*(IDIRA Secrets Manager was formerly known as CyberArk Conjur - this README uses the current names throughout, except where quoting real filenames, URLs, CLI commands, or literal program output that still use the older "Conjur"/"CyberArk" names.)*
 
 This project will help you to quickly build up the standalone, single VM lab environment to test Secrets Manager and k8s application integration including:
 - Secrets Manager follower in kubernetes
@@ -33,8 +33,8 @@ Run ```./check-versions.sh``` (needs ```curl``` and ```jq```) any time before re
     - LAN IP (eg 172.16.100.15/24)
     - Internet connection to do yum updating and packages installation
 - Secrets Manager appliance image:
-  - Contact Idira local representative for the appliance tarball (e.g. conjur-appliance-Rls-v13.9.0.tar.gz)
-  - Idira softwares and related tools can be downloaded at https://cyberark-customers.force.com/mplace/s/#software
+  - Contact IDIRA local representative for the appliance tarball (e.g. conjur-appliance-Rls-v13.9.0.tar.gz)
+  - IDIRA softwares and related tools can be downloaded at https://cyberark-customers.force.com/mplace/s/#software
   - The Secrets Manager CLI is installed automatically by ```2.conjur-setup/06.installing-conjur-cli.sh``` (downloads [conjur-cli-go](https://github.com/cyberark/conjur-cli-go) from GitHub) - no manual download needed
 - Java 17 (needed to build the Spring Boot cityapp in Part III.5 / ```4.cityapp-springboot```): saves time later to install it upfront with ```sudo dnf install -y java-17-openjdk java-17-openjdk-devel``` - not strictly required here, ```4.cityapp-springboot/41.building-cityapp-image.sh``` also installs it automatically if you skip this step
 
@@ -96,7 +96,7 @@ mkdir -p /opt/lab/setup_files
 chmod 755 /opt/lab/setup_files
 ```
 Copy Secrets Manager appliance image file to setup_files folder
-- Secrets Manager docker image: conjur-appliance-Rls-v13.9.0.tar.gz (or whatever version you received from Idira)
+- Secrets Manager docker image: conjur-appliance-Rls-v13.9.0.tar.gz (or whatever version you received from IDIRA)
 ## **Step1.2.3: Cloning git hub repo**
 This repo is public, so no GitHub auth is needed to clone it.
 ```
@@ -375,9 +375,9 @@ Using k8s dashboard GUI and select cityapp namespace to see more detail on citya
 ![cityapp](./images/10.cityapp-hardcode-pod.png)
 
 # 3.3. Running cityapp-conjurtok8sfile
-Application cityapp-conjurtok8sfile is configured with sidecar container (secrets-provider-for-k8s) which is run in the same pod with cityapp. The sidecar will connect to conjur follower pod, using jwt authentication method and check for database credentials. Information will then be written into ```/conjur/secret``` folder and linked to cityapp's ```/conjur``` folder using shared volume. The architecture of this method is described at below Idira document link.
+Application cityapp-conjurtok8sfile is configured with sidecar container (secrets-provider-for-k8s) which is run in the same pod with cityapp. The sidecar will connect to conjur follower pod, using jwt authentication method and check for database credentials. Information will then be written into ```/conjur/secret``` folder and linked to cityapp's ```/conjur``` folder using shared volume. The architecture of this method is described at below IDIRA document link.
 
-[Idira Secret Provider: Push to File mode](https://docs.cyberark.com/Product-Doc/OnlineHelp/AAM-DAP/Latest/en/Content/Integrations/k8s-ocp/cjr-k8s-secrets-provider-ic-p2f.htm?TocPath=Integrations%7COpenShift%2FKubernetes%7CSet%20up%20applications%7CSecrets%20Provider%20for%20Kubernetes%7CInit%20container%7C_____2 "Push to file")
+[IDIRA Secret Provider: Push to File mode](https://docs.cyberark.com/Product-Doc/OnlineHelp/AAM-DAP/Latest/en/Content/Integrations/k8s-ocp/cjr-k8s-secrets-provider-ic-p2f.htm?TocPath=Integrations%7COpenShift%2FKubernetes%7CSet%20up%20applications%7CSecrets%20Provider%20for%20Kubernetes%7CInit%20container%7C_____2 "Push to file")
 
 ![push2file](https://github.com/cyberark/secrets-provider-for-k8s/raw/main/assets/how-push-to-file-works.png)
 
@@ -407,9 +407,9 @@ Using browser and go to ```http://<VM-IP>:30081``` to see the result
 ![cityapp](./images/11.cityapp-conjurtok8sfile.png)
 
 # 3.4. Running cityapp-conjurtok8ssecret
-Application cityapp-conjurtok8ssecret is configured with a secrets-provider-for-k8s container in the same pod as cityapp (a sidecar - `conjur.org/container-mode: sidecar` plus `CONTAINER_MODE: init` on the provider container is the officially documented combination for this mode, see Idira's own Sidecar-tab example at the link below - `CONTAINER_MODE: init` here does not mean "runs once and exits"). It connects to the conjur follower pod using the jwt authentication method, fetches the database credentials, and keeps pushing them into kubernetes secret name ```db-creds``` (configured in the application's namespace, needs RBAC configuration to allow the update method on k8s secrets) on the interval set by ```conjur.org/secrets-refresh-interval```. When cityapp's main container running, it will access to secret content via files in /etc/secret-volume which is the shared volume that is linked to secret ```db-creds``` - since that's a K8s Secret **volume mount**, its content stays in sync automatically as the sidecar keeps updating ```db-creds```. The architecture of this method is described at below Idira document link.
+Application cityapp-conjurtok8ssecret is configured with a secrets-provider-for-k8s container in the same pod as cityapp (a sidecar - `conjur.org/container-mode: sidecar` plus `CONTAINER_MODE: init` on the provider container is the officially documented combination for this mode, see IDIRA's own Sidecar-tab example at the link below - `CONTAINER_MODE: init` here does not mean "runs once and exits"). It connects to the conjur follower pod using the jwt authentication method, fetches the database credentials, and keeps pushing them into kubernetes secret name ```db-creds``` (configured in the application's namespace, needs RBAC configuration to allow the update method on k8s secrets) on the interval set by ```conjur.org/secrets-refresh-interval```. When cityapp's main container running, it will access to secret content via files in /etc/secret-volume which is the shared volume that is linked to secret ```db-creds``` - since that's a K8s Secret **volume mount**, its content stays in sync automatically as the sidecar keeps updating ```db-creds```. The architecture of this method is described at below IDIRA document link.
 
-[Idira Secret Provider: Kubernetes Secret mode](https://docs.cyberark.com/Product-Doc/OnlineHelp/AAM-DAP/Latest/en/Content/Integrations/k8s-ocp/cjr-k8s-secrets-provider-ic.htm?tocpath=Integrations%7COpenShift%252FKubernetes%7CApp%20owner%253A%20Set%20up%20workloads%20in%20Kubernetes%7CSet%20up%20workloads%20(cert-based%20authn)%7CSecrets%20Provider%20for%20Kubernetes%7CInit%20container%252FSidecar%7C_____1 "Push to secret")
+[IDIRA Secret Provider: Kubernetes Secret mode](https://docs.cyberark.com/Product-Doc/OnlineHelp/AAM-DAP/Latest/en/Content/Integrations/k8s-ocp/cjr-k8s-secrets-provider-ic.htm?tocpath=Integrations%7COpenShift%252FKubernetes%7CApp%20owner%253A%20Set%20up%20workloads%20in%20Kubernetes%7CSet%20up%20workloads%20(cert-based%20authn)%7CSecrets%20Provider%20for%20Kubernetes%7CInit%20container%252FSidecar%7C_____1 "Push to secret")
 
 ![push2k8s](./images/cj-push2secrets.png)
 
@@ -519,7 +519,7 @@ Prints the ```ExternalSecret``` sync status and the decoded contents of ```conju
 Deploys the same ```cityapp``` PHP image built in Part III, unmodified, mounting ```conjur-secret``` directly at ```/etc/secret-volume```. Using browser and go to ```http://<VM-IP>:30084``` to see the result - the page will show the secret source as "K8S SECRETS", same as ```cityapp-conjurtok8ssecret```, but this Secret was populated by ESO rather than a sidecar.
 
 # PART III-B: TESTING THE CONJUR CSI PROVIDER
-A third way to deliver secrets into a pod: the Kubernetes Secrets Store CSI Driver mounts them directly as a volume, resolved live by Idira's Secrets Manager CSI provider at mount time. The provider authenticates using an explicit identity rather than auto-resolving one from JWT claims, so - like ESO - the app itself needs no ServiceAccount token projection, sidecar, or Secrets Manager awareness.
+A third way to deliver secrets into a pod: the Kubernetes Secrets Store CSI Driver mounts them directly as a volume, resolved live by IDIRA's Secrets Manager CSI provider at mount time. The provider authenticates using an explicit identity rather than auto-resolving one from JWT claims, so - like ESO - the app itself needs no ServiceAccount token projection, sidecar, or Secrets Manager awareness.
 
 ## Step3B.1: Reviewing 00.config.sh
 ```
@@ -550,7 +550,7 @@ Replaces the follower deployed in Part II with one that has both ```authn-jwt/k8
 ```
 ./03.installing-conjur-csi-provider.sh
 ```
-Installs Idira's ```conjur-k8s-csi-provider``` Helm chart into ```kube-system```.
+Installs IDIRA's ```conjur-k8s-csi-provider``` Helm chart into ```kube-system```.
 
 ## Step3B.6: Creating the SecretProviderClass
 ```
