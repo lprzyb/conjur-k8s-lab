@@ -615,7 +615,7 @@ This is the same JWT authentication flow used by every variant since Part II (a 
 <img src="./images/15.k8s-jwt-authn-flow.png" alt="jwtauthnflow" width="75%">
 
 # PART IV: FINAL TESTING
-This is the actual payoff of the whole lab: rotate the real database password once, and watch each of the 9 integration methods handle it differently - some update live, some need a redeploy, and two are deliberately left broken. It's done in up to three steps, but most people only need the first one.
+This is the actual payoff of the whole lab: rotate the real database password once, and watch each of the 9 integration methods handle it differently - some update live, some need a redeploy, and two are deliberately left broken. It's done in up to five steps, but most people only need the first one.
 
 ## Step4.1: Rotate the real password (test/CityApp/DBAccount/*)
 ```
@@ -642,7 +642,7 @@ http://<VM-IP>:30001/matrix.html
 | cityapp-springboot-native | 30088 | 🔁 Needs a redeploy |
 | cityapp-csi | 30086 | 🔁 Needs a redeploy |
 | cityapp-summon | 30087 | 🔁 Needs a redeploy |
-| cityapp-hardcode | 30080 | ❌ Broken - by design, see below |
+| cityapp-hardcode | 30080 | ❌ Broken by design - optional manual fix in Step4.5 |
 | cityapp-eso | 30084 | ❌ Broken until Step4.3 or Step4.4 |
 
 <details>
@@ -650,7 +650,7 @@ http://<VM-IP>:30001/matrix.html
 
 - **Live, no redeploy**: both read the secret from a shared volume (a file or a K8s Secret) that the secrets-provider sidecar keeps refreshing on its own interval - the app just reads whatever's currently there on every page load.
 - **Needs a redeploy**: each of these fetches the secret exactly once and has no ongoing refresh process afterward, just for different reasons per method - ```conjurtok8ssecret-init```'s Secrets Provider is a true initContainer that exits after running once; ```springboot-sidecar```'s password is wired up as a `secretKeyRef` **env var**, which Kubernetes captures once at pod start even though the sidecar keeps the underlying Secret current; ```springboot-native``` fetches once via the Secrets Manager SDK at Spring startup; this lab's CSI driver install doesn't have secret rotation enabled, so the mounted volume is fetched once at mount time; and Summon fetches once, then ```exec```s into cityapp's own process, leaving nothing running afterward to refetch anything.
-- **Broken by design**: ```cityapp-hardcode``` never talks to Secrets Manager at all, so it can never see a rotated password. ```cityapp-eso``` reads ```test/CityAppESO/DBAccountESO/*```, a separate copy of the credentials that Step4.1 intentionally does not touch - see Step4.3 to repair it.
+- **Broken by design**: ```cityapp-hardcode``` never talks to Secrets Manager at all, so it can never see a rotated password - see Step4.5 for the only way to fix it (manually). ```cityapp-eso``` reads ```test/CityAppESO/DBAccountESO/*```, a separate copy of the credentials that Step4.1 intentionally does not touch - see Step4.3 to repair it.
 </details>
 
 ## Step4.2: Redeploy the apps that don't update live
@@ -670,4 +670,25 @@ No new password, no MySQL change - just copies ```test/CityApp/DBAccount/passwor
 ./01.rotating-db-password.sh all
 ```
 Same MySQL rotation as Step4.1, but updates ```test/CityApp/DBAccount/password``` and ```test/CityAppESO/DBAccountESO/password``` together in one step - only ```cityapp-hardcode``` is left stuck on the old password. Still run Step4.2 afterward for the same 5 apps - ```all``` mode rotates the real password too, it just also keeps ```cityapp-eso``` in sync at the same time.
+```
+./02.redeploying-rotated-apps.sh
+```
+
+## Step4.5 (optional): Manually fix cityapp-hardcode
+```
+./03.redeploying-cityapp-hardcode.sh
+```
+```cityapp-hardcode``` has no secret to rotate - its password is a literal string baked into its Deployment spec, not a reference to anything in Secrets Manager. There's no live-update, no refresh-and-redeploy, nothing to repair through Secrets Manager at all - the only way to fix it is to manually edit that string and redeploy, which is exactly what this script does, echoing the before/after so the manual edit is visible instead of hidden:
+```
+ℹ️  cityapp-hardcode has no secret to rotate - its password is a literal string in the spec. Replacing it by hand:
+
+  --- current spec ---
+          - name: DBPASS
+            value: 'oldpassword...'
+
+  --- new spec ---
+          - name: DBPASS
+            value: 'newpassword...'
+```
+This "fix" only holds until the next rotation - unlike every other variant in this lab, there's no way to make ```cityapp-hardcode``` pick up a password change automatically.
 # --- LAB END ---
