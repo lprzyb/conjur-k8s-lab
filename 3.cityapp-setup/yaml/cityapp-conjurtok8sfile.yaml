@@ -39,9 +39,9 @@ spec:
         conjur.org/secrets-destination: file
         conjur.org/jwt-token-path: /var/run/secrets/tokens/jwt
         conjur.org/conjur-secrets.cityapp-conjurtok8sfile: |
-          - dbaddr: test/host1/host
-          - dbuser: test/host1/user
-          - dbpass: test/host1/pass
+          - dbaddr: test/CityApp/DBAccount/address
+          - dbuser: test/CityApp/DBAccount/username
+          - dbpass: test/CityApp/DBAccount/password
         conjur.org/secret-file-path.cityapp-conjurtok8sfile: ./worlddb.json
         conjur.org/secret-file-format.cityapp-conjurtok8sfile: 'json'
         conjur.org/secrets-refresh-interval: 30s

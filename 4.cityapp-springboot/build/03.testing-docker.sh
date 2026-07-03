@@ -25,9 +25,9 @@ sudo podman run \
         --env DB_PASS=null \
         --env DB_PORT=3306 \
         --env DB_NAME=world \
-        --env CONJUR_MAPPING_DB_HOST='test/host1/host' \
-        --env CONJUR_MAPPING_DB_USER='test/host1/user' \
-        --env CONJUR_MAPPING_DB_PASS='test/host1/pass' \
+        --env CONJUR_MAPPING_DB_HOST='test/CityApp/DBAccount/address' \
+        --env CONJUR_MAPPING_DB_USER='test/CityApp/DBAccount/username' \
+        --env CONJUR_MAPPING_DB_PASS='test/CityApp/DBAccount/password' \
         cityapp-conjur-springboot-plugin
 
 sudo podman logs -f cityapp

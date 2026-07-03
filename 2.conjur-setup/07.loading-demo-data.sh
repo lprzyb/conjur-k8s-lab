@@ -11,11 +11,11 @@ conjur -d policy load -f ./policies/root-policy.yaml -b root
 RC1=$?
 conjur -d policy load -f ./policies/demo-data.yaml -b root
 RC2=$?
-conjur variable set -i test/host1/host -v $DB_HOST
+conjur variable set -i test/CityApp/DBAccount/address -v $DB_HOST
 RC3=$?
-conjur variable set -i test/host1/user -v $DB_USER
+conjur variable set -i test/CityApp/DBAccount/username -v $DB_USER
 RC4=$?
-conjur variable set -i test/host1/pass -v $DB_PASSWORD
+conjur variable set -i test/CityApp/DBAccount/password -v $DB_PASSWORD
 RC5=$?
 set +x
 if [ $RC1 -eq 0 ] && [ $RC2 -eq 0 ] && [ $RC3 -eq 0 ] && [ $RC4 -eq 0 ] && [ $RC5 -eq 0 ]; then

@@ -7,7 +7,7 @@ if [[ "$READY" != true ]]; then
 fi
 
 # Redeploys the 5 cityapp variants that do NOT pick up a rotated
-# test/host1/pass live (see README.md PART IV and CLAUDE.md for why each
+# test/CityApp/DBAccount/password live (see README.md PART IV and CLAUDE.md for why each
 # one needs this): cityapp-conjurtok8ssecret-init, cityapp-springboot-sidecar,
 # cityapp-springboot-native, cityapp-csi and cityapp-summon. Each one is
 # owned by a different folder, and each of those folders' own running
@@ -20,7 +20,7 @@ fi
 # NOT included here - they pick up a rotated password live and never
 # need a redeploy. cityapp-hardcode and cityapp-eso are also excluded -
 # neither one is fixed by a redeploy (see 01.rotating-db-password.sh's
-# host1/host2/all modes for those instead).
+# shared/eso/all modes for those instead).
 
 set -x
 
@@ -42,7 +42,7 @@ RC5=$?
 set +x
 
 if [ $RC1 -eq 0 ] && [ $RC2 -eq 0 ] && [ $RC3 -eq 0 ] && [ $RC4 -eq 0 ] && [ $RC5 -eq 0 ]; then
-    printf '\033[1;32m✅ Done:\033[0m cityapp-conjurtok8ssecret-init, cityapp-springboot-sidecar, cityapp-springboot-native, cityapp-csi and cityapp-summon all redeployed - each fetched the current test/host1/pass fresh on startup.\n'
+    printf '\033[1;32m✅ Done:\033[0m cityapp-conjurtok8ssecret-init, cityapp-springboot-sidecar, cityapp-springboot-native, cityapp-csi and cityapp-summon all redeployed - each fetched the current test/CityApp/DBAccount/password fresh on startup.\n'
 else
     printf '\033[1;31m❌ Failed:\033[0m at least one redeploy failed - check the output above for which one (RC1=%s conjurtok8ssecret-init, RC2=%s springboot-sidecar, RC3=%s springboot-native, RC4=%s csi, RC5=%s summon).\n' "$RC1" "$RC2" "$RC3" "$RC4" "$RC5"
 fi

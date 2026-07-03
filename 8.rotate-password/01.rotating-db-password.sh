@@ -6,30 +6,30 @@ if [[ "$READY" != true ]]; then
     exit
 fi
 
-MODE="${1:-host1}"
+MODE="${1:-shared}"
 
 case "$MODE" in
-    host1|host2|all) ;;
+    shared|eso|all) ;;
     *)
-        echo "Usage: $0 [host1|host2|all]"
-        echo "  host1 (default): rotate the real MySQL password and update test/host1/pass only - test/host2/pass (cityapp-eso) is intentionally left stale, demonstrating what rotation costs an app pointed at the wrong variable."
-        echo "  host2: sync test/host2/pass to test/host1/pass's CURRENT value - no new password, no MySQL change. Use this to repair cityapp-eso after a host1 rotation, without doing a fresh rotation."
-        echo "  all: rotate the real MySQL password and update both test/host1/pass and test/host2/pass together - every Secrets Manager-integrated variant keeps working."
+        echo "Usage: $0 [shared|eso|all]"
+        echo "  shared (default): rotate the real MySQL password and update test/CityApp/DBAccount/password only - test/CityAppESO/DBAccountESO/password (cityapp-eso) is intentionally left stale, demonstrating what rotation costs an app pointed at the wrong variable."
+        echo "  eso: sync test/CityAppESO/DBAccountESO/password to test/CityApp/DBAccount/password's CURRENT value - no new password, no MySQL change. Use this to repair cityapp-eso after a shared rotation, without doing a fresh rotation."
+        echo "  all: rotate the real MySQL password and update both test/CityApp/DBAccount/password and test/CityAppESO/DBAccountESO/password together - every Secrets Manager-integrated variant keeps working."
         exit 1
         ;;
 esac
 
-# Default (MODE=host1) deliberately only updates test/host1/pass, not
-# test/host2/pass - this is the demo story: cityapp-conjurtok8sfile,
+# Default (MODE=shared) deliberately only updates test/CityApp/DBAccount/password, not
+# test/CityAppESO/DBAccountESO/password - this is the demo story: cityapp-conjurtok8sfile,
 # cityapp-conjurtok8ssecret, cityapp-conjurtok8ssecret-init,
 # cityapp-springboot-sidecar, cityapp-springboot-native, cityapp-csi and
-# cityapp-summon all read test/host1/* and keep working (live, or after a
+# cityapp-summon all read test/CityApp/DBAccount/* and keep working (live, or after a
 # redeploy - see README.md PART IV for exactly which apps need which).
-# cityapp-eso reads the separate test/host2/* copy (see
+# cityapp-eso reads the separate test/CityAppESO/DBAccountESO/* copy (see
 # 5.conjur-eso/02.adding-conjur-eso-policy.sh) and is intentionally left
 # behind here, right alongside cityapp-hardcode which never talks to
 # Secrets Manager at all - both go stale, everything else survives the rotation.
-# Pass "host2" to repair just cityapp-eso afterward without a fresh
+# Pass "eso" to repair just cityapp-eso afterward without a fresh
 # rotation, or "all" to rotate both together from the start.
 
 # The full "watch it rotate" story only makes sense once all 9 demo
@@ -58,20 +58,20 @@ if [ $FOUND_COUNT -lt 9 ]; then
     esac
 fi
 
-if [ "$MODE" = "host2" ]; then
+if [ "$MODE" = "eso" ]; then
     set -x
-    CURRENT_PASSWORD=$(conjur variable get -i test/host1/pass)
+    CURRENT_PASSWORD=$(conjur variable get -i test/CityApp/DBAccount/password)
     GET_RC=$?
 
-    conjur variable set -i test/host2/pass -v "$CURRENT_PASSWORD"
-    HOST2_RC=$?
+    conjur variable set -i test/CityAppESO/DBAccountESO/password -v "$CURRENT_PASSWORD"
+    ESO_RC=$?
     set +x
 
-    if [ $GET_RC -eq 0 ] && [ $HOST2_RC -eq 0 ]; then
-        printf '\033[1;32m✅ Done:\033[0m test/host2/pass synced to test/host1/pass'"'"'s current value.\n'
+    if [ $GET_RC -eq 0 ] && [ $ESO_RC -eq 0 ]; then
+        printf '\033[1;32m✅ Done:\033[0m test/CityAppESO/DBAccountESO/password synced to test/CityApp/DBAccount/password'"'"'s current value.\n'
         printf '\033[1;33m➡️  Next:\033[0m cityapp-eso will pick this up on its own sync schedule - no MySQL change was needed since the password itself did not change.\n'
     else
-        printf '\033[1;31m❌ Failed:\033[0m could not read test/host1/pass or update test/host2/pass - check the output above.\n'
+        printf '\033[1;31m❌ Failed:\033[0m could not read test/CityApp/DBAccount/password or update test/CityAppESO/DBAccountESO/password - check the output above.\n'
     fi
     exit
 fi
@@ -82,23 +82,23 @@ set -x
 podman exec mysqldb mysql -uroot -p$DB_ROOT_PASSWORD -e "ALTER USER '$DB_USER'@'%' IDENTIFIED BY '$NEW_PASSWORD'; FLUSH PRIVILEGES;"
 MYSQL_RC=$?
 
-conjur variable set -i test/host1/pass -v "$NEW_PASSWORD"
-HOST1_RC=$?
+conjur variable set -i test/CityApp/DBAccount/password -v "$NEW_PASSWORD"
+SHARED_RC=$?
 
-HOST2_RC=0
+ESO_RC=0
 if [ "$MODE" = "all" ]; then
-    conjur variable set -i test/host2/pass -v "$NEW_PASSWORD"
-    HOST2_RC=$?
+    conjur variable set -i test/CityAppESO/DBAccountESO/password -v "$NEW_PASSWORD"
+    ESO_RC=$?
 fi
 set +x
 
-if [ $MYSQL_RC -eq 0 ] && [ $HOST1_RC -eq 0 ] && [ $HOST2_RC -eq 0 ]; then
+if [ $MYSQL_RC -eq 0 ] && [ $SHARED_RC -eq 0 ] && [ $ESO_RC -eq 0 ]; then
     if [ "$MODE" = "all" ]; then
-        printf '\033[1;32m✅ Done:\033[0m %s password rotated in MySQL and updated in Secrets Manager (test/host1/pass and test/host2/pass).\n' "$DB_USER"
+        printf '\033[1;32m✅ Done:\033[0m %s password rotated in MySQL and updated in Secrets Manager (test/CityApp/DBAccount/password and test/CityAppESO/DBAccountESO/password).\n' "$DB_USER"
         printf '\033[1;33m➡️  Next:\033[0m cityapp-conjurtok8sfile and cityapp-conjurtok8ssecret refresh live within their secrets-refresh-interval, no redeploy needed. cityapp-conjurtok8ssecret-init (fetches once via a true initContainer at pod creation, no ongoing refresh process), cityapp-springboot-sidecar (secret wired up as an env var, frozen at pod start), cityapp-springboot-native (fetches once via the Secrets Manager SDK at startup), cityapp-csi (rotation is not enabled on this lab'"'"'s CSI driver install) and cityapp-summon (Summon fetches once and exec'"'"'s into cityapp'"'"'s process, no refresh loop of its own) all need a redeploy to pick it up. cityapp-hardcode is the only one still stuck on the old password now, since it never talks to Secrets Manager at all.\n'
     else
-        printf '\033[1;32m✅ Done:\033[0m %s password rotated in MySQL and updated in Secrets Manager (test/host1/pass only - test/host2/pass left untouched on purpose).\n' "$DB_USER"
-        printf '\033[1;33m➡️  Next:\033[0m cityapp-conjurtok8sfile and cityapp-conjurtok8ssecret refresh live within their secrets-refresh-interval, no redeploy needed. cityapp-conjurtok8ssecret-init, cityapp-springboot-sidecar, cityapp-springboot-native, cityapp-csi and cityapp-summon need a redeploy to pick it up. cityapp-hardcode and cityapp-eso are now both stuck on the old password: hardcode because it never talks to Secrets Manager at all, eso because it reads test/host2/* which this script left alone by default - run this script again with "host2" to repair just that, or "all" next time to rotate both together from the start.\n'
+        printf '\033[1;32m✅ Done:\033[0m %s password rotated in MySQL and updated in Secrets Manager (test/CityApp/DBAccount/password only - test/CityAppESO/DBAccountESO/password left untouched on purpose).\n' "$DB_USER"
+        printf '\033[1;33m➡️  Next:\033[0m cityapp-conjurtok8sfile and cityapp-conjurtok8ssecret refresh live within their secrets-refresh-interval, no redeploy needed. cityapp-conjurtok8ssecret-init, cityapp-springboot-sidecar, cityapp-springboot-native, cityapp-csi and cityapp-summon need a redeploy to pick it up. cityapp-hardcode and cityapp-eso are now both stuck on the old password: hardcode because it never talks to Secrets Manager at all, eso because it reads test/CityAppESO/DBAccountESO/* which this script left alone by default - run this script again with "eso" to repair just that, or "all" next time to rotate both together from the start.\n'
     fi
 else
     printf '\033[1;31m❌ Failed:\033[0m password rotation failed partway through - check the output above. MySQL and Secrets Manager may now be out of sync; do not leave it in this state, re-run once you have fixed the cause.\n'

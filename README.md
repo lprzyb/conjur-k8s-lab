@@ -403,7 +403,7 @@ INFO:  2022/11/20 17:29:18.219542 main.go:226: CSPFK014I Authenticator setting C
 INFO:  2022/11/20 17:29:18.219587 authenticator_factory.go:34: CAKC075 Chosen "authn-jwt" flow
 INFO:  2022/11/20 17:29:18.327256 authenticator.go:63: CAKC066 Performing authn-jwt
 INFO:  2022/11/20 17:29:18.499870 authenticator.go:83: CAKC035 Successfully authenticated
-INFO:  2022/11/20 17:29:18.499908 conjur_secrets_retriever.go:74: CSPFK003I Retrieving following secrets from DAP/Conjur: [test/host1/host test/host1/user test/host1/pass]
+INFO:  2022/11/20 17:29:18.499908 conjur_secrets_retriever.go:74: CSPFK003I Retrieving following secrets from DAP/Conjur: [test/CityApp/DBAccount/address test/CityApp/DBAccount/username test/CityApp/DBAccount/password]
 INFO:  2022/11/20 17:29:18.499934 conjur_client.go:21: CSPFK002I Creating DAP/Conjur client
 INFO:  2022/11/20 17:29:18.560742 provide_conjur_secrets.go:126: CSPFK015I DAP/Conjur Secrets pushed to shared volume successfully
 ```
@@ -436,7 +436,7 @@ INFO:  2022/11/20 17:51:05.420251 k8s_secrets_client.go:56: CSPFK004I Creating K
 INFO:  2022/11/20 17:51:05.420739 k8s_secrets_client.go:21: CSPFK005I Retrieving Kubernetes secret 'db-creds' from namespace 'cityapp'
 INFO:  2022/11/20 17:51:05.438234 authenticator.go:63: CAKC066 Performing authn-jwt
 INFO:  2022/11/20 17:51:05.550677 authenticator.go:83: CAKC035 Successfully authenticated
-INFO:  2022/11/20 17:51:05.550718 conjur_secrets_retriever.go:74: CSPFK003I Retrieving following secrets from DAP/Conjur: [test/host1/host test/host1/user test/host1/pass]
+INFO:  2022/11/20 17:51:05.550718 conjur_secrets_retriever.go:74: CSPFK003I Retrieving following secrets from DAP/Conjur: [test/CityApp/DBAccount/address test/CityApp/DBAccount/username test/CityApp/DBAccount/password]
 INFO:  2022/11/20 17:51:05.550726 conjur_client.go:21: CSPFK002I Creating DAP/Conjur client
 INFO:  2022/11/20 17:51:05.682514 k8s_secrets_client.go:56: CSPFK004I Creating Kubernetes client
 INFO:  2022/11/20 17:51:05.683098 k8s_secrets_client.go:40: CSPFK006I Updating Kubernetes secret 'db-creds' in namespace 'cityapp'
@@ -504,7 +504,7 @@ Installs Helm if missing, then the ```external-secrets``` Helm chart into its ow
 ```
 ./02.adding-conjur-eso-policy.sh
 ```
-Grants the ESO service account JWT authentication access, and sets a second demo variable set (```test/host2/host```, ```test/host2/user```, ```test/host2/pass```) to the same working database credentials used elsewhere in the lab.
+Grants the ESO service account JWT authentication access, and sets a second demo variable set (```test/CityAppESO/DBAccountESO/address```, ```test/CityAppESO/DBAccountESO/username```, ```test/CityAppESO/DBAccountESO/password```) to the same working database credentials used elsewhere in the lab.
 
 ## Step3A.4: Creating the Secrets Manager SecretStore
 ```
@@ -516,7 +516,7 @@ Registers Secrets Manager as an ESO ```SecretStore``` using JWT auth against the
 ```
 ./04.creating-eso-secret.sh
 ```
-Tells ESO to sync ```test/host2/*``` into a native Kubernetes Secret named ```conjur-secret```.
+Tells ESO to sync ```test/CityAppESO/DBAccountESO/*``` into a native Kubernetes Secret named ```conjur-secret```.
 
 ## Step3A.6: Verifying the synced secret
 ```
@@ -576,7 +576,7 @@ Creates a ```SecretProviderClass``` named ```conjur-credentials``` in the ```cit
 ```
 ./06.running-cityapp-csi-test.sh
 ```
-Deploys ```cityapp-csi```, mounting secrets via the CSI volume at ```/etc/secret-volume``` (resolved from ```test/host1/*```, the same working demo credentials used since Part II). Using browser and go to ```http://<VM-IP>:30086``` to see the result.
+Deploys ```cityapp-csi```, mounting secrets via the CSI volume at ```/etc/secret-volume``` (resolved from ```test/CityApp/DBAccount/*```, the same working demo credentials used since Part II). Using browser and go to ```http://<VM-IP>:30086``` to see the result.
 
 <img src="./images/15.cityapp-csi-idira.png" alt="cityappcsi" width="75%">
 
@@ -594,7 +594,7 @@ Set ```READY=true``` to continue - this folder reuses the same ```2.conjur-setup
 ```
 ./01.adding-conjur-summon-policy.sh
 ```
-Adds a ```cityapp-summon``` host to the existing ```authn-jwt/k8s``` authenticator and grants it read/execute on ```test/host1/*``` - the same working demo credentials used since Part II. Like ESO's policy in Part III-A, this is a self-contained addition and does not modify ```2.conjur-setup/policies/authn-jwt-k8s.yaml```.
+Adds a ```cityapp-summon``` host to the existing ```authn-jwt/k8s``` authenticator and grants it read/execute on ```test/CityApp/DBAccount/*``` - the same working demo credentials used since Part II. Like ESO's policy in Part III-A, this is a self-contained addition and does not modify ```2.conjur-setup/policies/authn-jwt-k8s.yaml```.
 
 ## Step3C.3: Building the cityapp-summon image
 ```
@@ -617,7 +617,7 @@ This is the same JWT authentication flow used by every variant since Part II (a 
 # PART IV: FINAL TESTING
 This is the actual payoff of the whole lab: rotate the real database password once, and watch each of the 9 integration methods handle it differently - some update live, some need a redeploy, and two are deliberately left broken. It's done in up to three steps, but most people only need the first one.
 
-## Step4.1: Rotate the real password (test/host1/*)
+## Step4.1: Rotate the real password (test/CityApp/DBAccount/*)
 ```
 cd /opt/lab/conjur-k8s-lab/8.rotate-password
 vi 00.config.sh
@@ -626,7 +626,7 @@ Set ```READY=true``` to continue - this folder reuses the same ```2.conjur-setup
 ```
 ./01.rotating-db-password.sh
 ```
-Changes the actual MySQL password and updates ```test/host1/pass``` in Secrets Manager - ```test/host2/pass``` is deliberately left untouched (see Step4.3). Refresh each cityapp page after ~30-60 seconds, or open the rotation matrix below to watch all of them at once:
+Changes the actual MySQL password and updates ```test/CityApp/DBAccount/password``` in Secrets Manager - ```test/CityAppESO/DBAccountESO/password``` is deliberately left untouched (see Step4.3). Refresh each cityapp page after ~30-60 seconds, or open the rotation matrix below to watch all of them at once:
 ```
 http://<VM-IP>:30001/matrix.html
 ```
@@ -650,7 +650,7 @@ http://<VM-IP>:30001/matrix.html
 
 - **Live, no redeploy**: both read the secret from a shared volume (a file or a K8s Secret) that the secrets-provider sidecar keeps refreshing on its own interval - the app just reads whatever's currently there on every page load.
 - **Needs a redeploy**: each of these fetches the secret exactly once and has no ongoing refresh process afterward, just for different reasons per method - ```conjurtok8ssecret-init```'s Secrets Provider is a true initContainer that exits after running once; ```springboot-sidecar```'s password is wired up as a `secretKeyRef` **env var**, which Kubernetes captures once at pod start even though the sidecar keeps the underlying Secret current; ```springboot-native``` fetches once via the Secrets Manager SDK at Spring startup; this lab's CSI driver install doesn't have secret rotation enabled, so the mounted volume is fetched once at mount time; and Summon fetches once, then ```exec```s into cityapp's own process, leaving nothing running afterward to refetch anything.
-- **Broken by design**: ```cityapp-hardcode``` never talks to Secrets Manager at all, so it can never see a rotated password. ```cityapp-eso``` reads ```test/host2/*```, a separate copy of the credentials that Step4.1 intentionally does not touch - see Step4.3 to repair it.
+- **Broken by design**: ```cityapp-hardcode``` never talks to Secrets Manager at all, so it can never see a rotated password. ```cityapp-eso``` reads ```test/CityAppESO/DBAccountESO/*```, a separate copy of the credentials that Step4.1 intentionally does not touch - see Step4.3 to repair it.
 </details>
 
 ## Step4.2: Redeploy the apps that don't update live
@@ -661,13 +661,13 @@ Redeploys all 5 "needs a redeploy" apps from the table above in one step. Each o
 
 ## Step4.3 (optional): Repair cityapp-eso
 ```
-./01.rotating-db-password.sh host2
+./01.rotating-db-password.sh eso
 ```
-No new password, no MySQL change - just copies ```test/host1/pass```'s current value into ```test/host2/pass```. ```cityapp-eso``` picks it up on its own ESO sync schedule.
+No new password, no MySQL change - just copies ```test/CityApp/DBAccount/password```'s current value into ```test/CityAppESO/DBAccountESO/password```. ```cityapp-eso``` picks it up on its own ESO sync schedule.
 
 ## Step4.4 (alternative to Step4.1): Rotate both together
 ```
 ./01.rotating-db-password.sh all
 ```
-Same MySQL rotation as Step4.1, but updates ```test/host1/pass``` and ```test/host2/pass``` together in one step - only ```cityapp-hardcode``` is left stuck on the old password. Still run Step4.2 afterward for the same 5 apps - ```all``` mode rotates the real password too, it just also keeps ```cityapp-eso``` in sync at the same time.
+Same MySQL rotation as Step4.1, but updates ```test/CityApp/DBAccount/password``` and ```test/CityAppESO/DBAccountESO/password``` together in one step - only ```cityapp-hardcode``` is left stuck on the old password. Still run Step4.2 afterward for the same 5 apps - ```all``` mode rotates the real password too, it just also keeps ```cityapp-eso``` in sync at the same time.
 # --- LAB END ---

@@ -61,11 +61,11 @@ spec:
           - name: CONJUR_AUTHENTICATOR_ID
             value: k8s
           - name: CONJUR_MAPPING_DB_HOST
-            value: test/host1/host
+            value: test/CityApp/DBAccount/address
           - name: CONJUR_MAPPING_DB_USER
-            value: test/host1/user
+            value: test/CityApp/DBAccount/username
           - name: CONJUR_MAPPING_DB_PASS
-            value: test/host1/pass
+            value: test/CityApp/DBAccount/password
         envFrom:
           - configMapRef:
               name: apps-springboot-cm

@@ -5,9 +5,9 @@ metadata:
   name: summon-secrets
 data:
   secrets.yml: |-
-    DBADDR: !var test/host1/host
-    DBUSER: !var test/host1/user
-    DBPASS: !var test/host1/pass
+    DBADDR: !var test/CityApp/DBAccount/address
+    DBUSER: !var test/CityApp/DBAccount/username
+    DBPASS: !var test/CityApp/DBAccount/password
 ---
 apiVersion: v1
 kind: ServiceAccount
