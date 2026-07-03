@@ -393,19 +393,23 @@ To deploy conjurtok8sfile application, run:
 
 Going to k8s dashboard GUI, select cityapp namespace and open cityapp-conjurtok8sfile 's sidecar container log, the detail of authentication result will be shown as below
 ```
-INFO:  2022/11/20 17:29:18.217628 main.go:62: CSPFK008I CyberArk Secrets Provider for Kubernetes v1.4.4-5f8218a starting up
-INFO:  2022/11/20 17:29:18.219453 main.go:226: CSPFK014I Authenticator setting DEBUG provided by environment
-INFO:  2022/11/20 17:29:18.219480 configuration_factory.go:82: CAKC070 Chosen "authn-jwt" configuration
-INFO:  2022/11/20 17:29:18.219521 main.go:217: CSPFK014I Authenticator setting CONTAINER_MODE provided by annotation conjur.org/container-mode
-INFO:  2022/11/20 17:29:18.219529 main.go:226: CSPFK014I Authenticator setting DEBUG provided by environment
-INFO:  2022/11/20 17:29:18.219535 main.go:217: CSPFK014I Authenticator setting JWT_TOKEN_PATH provided by annotation conjur.org/jwt-token-path
-INFO:  2022/11/20 17:29:18.219542 main.go:226: CSPFK014I Authenticator setting CONJUR_AUTHN_LOGIN provided by environment
-INFO:  2022/11/20 17:29:18.219587 authenticator_factory.go:34: CAKC075 Chosen "authn-jwt" flow
-INFO:  2022/11/20 17:29:18.327256 authenticator.go:63: CAKC066 Performing authn-jwt
-INFO:  2022/11/20 17:29:18.499870 authenticator.go:83: CAKC035 Successfully authenticated
-INFO:  2022/11/20 17:29:18.499908 conjur_secrets_retriever.go:74: CSPFK003I Retrieving following secrets from DAP/Conjur: [test/CityApp/DBAccount/address test/CityApp/DBAccount/username test/CityApp/DBAccount/password]
-INFO:  2022/11/20 17:29:18.499934 conjur_client.go:21: CSPFK002I Creating DAP/Conjur client
-INFO:  2022/11/20 17:29:18.560742 provide_conjur_secrets.go:126: CSPFK015I DAP/Conjur Secrets pushed to shared volume successfully
+INFO:  2026/07/03 14:48:22.910355 entrypoint.go:346: CSPFK014I Authenticator setting LOG_LEVEL provided by environment
+INFO:  2026/07/03 14:48:22.910426 entrypoint.go:346: CSPFK014I Authenticator setting DEBUG provided by environment
+INFO:  2026/07/03 14:48:22.910432 entrypoint.go:89: CSPFK008I CyberArk Secrets Provider for Kubernetes v1.10.0-bcf147d starting up
+INFO:  2026/07/03 14:48:22.910539 entrypoint.go:346: CSPFK014I Authenticator setting LOG_LEVEL provided by environment
+INFO:  2026/07/03 14:48:22.910546 entrypoint.go:346: CSPFK014I Authenticator setting DEBUG provided by environment
+INFO:  2026/07/03 14:48:22.910553 configuration_factory.go:89: CAKC070 Chosen "authn-jwt" configuration
+INFO:  2026/07/03 14:48:22.910569 entrypoint.go:337: CSPFK014I Authenticator setting CONTAINER_MODE provided by annotation conjur.org/container-mode
+INFO:  2026/07/03 14:48:22.910574 entrypoint.go:346: CSPFK014I Authenticator setting DEBUG provided by environment
+INFO:  2026/07/03 14:48:22.910580 entrypoint.go:346: CSPFK014I Authenticator setting LOG_LEVEL provided by environment
+INFO:  2026/07/03 14:48:22.910586 entrypoint.go:337: CSPFK014I Authenticator setting JWT_TOKEN_PATH provided by annotation conjur.org/jwt-token-path
+INFO:  2026/07/03 14:48:22.910590 entrypoint.go:346: CSPFK014I Authenticator setting CONJUR_AUTHN_LOGIN provided by environment
+INFO:  2026/07/03 14:48:22.911174 authenticator_factory.go:34: CAKC075 Chosen "authn-jwt" flow
+INFO:  2026/07/03 14:48:22.911328 authenticator.go:98: CAKC066 Performing authn-jwt
+INFO:  2026/07/03 14:48:22.950823 authenticator.go:118: CAKC035 Successfully authenticated
+INFO:  2026/07/03 14:48:22.950855 conjur_client.go:23: CSPFK002I Creating DAP/Conjur client
+WARN:  2026/07/03 14:48:22.951080 conjur_client_wrapper.go:28: CSPFK090E V2 batch retrieval not available, falling back to V1: V2 Batch Retrieve Secrets API is not supported in Conjur Enterprise/OSS
+INFO:  2026/07/03 14:48:22.970436 provide_conjur_secrets.go:126: CSPFK015I DAP/Conjur Secrets pushed to shared volume successfully
 ```
 
 Using browser and go to ```http://<VM-IP>:30081``` to see the result
@@ -424,23 +428,28 @@ Application cityapp-conjurtok8ssecret is configured with a secrets-provider-for-
 
 In k8s dashboard's GUI, checking for the conjurtok8ssecret container's log in the pod, the detail of conjur jwt authentication and secret pushing will be shown as below
 ```
-INFO:  2022/11/20 17:51:05.371062 main.go:62: CSPFK008I CyberArk Secrets Provider for Kubernetes v1.4.4-5f8218a starting up
-INFO:  2022/11/20 17:51:05.371238 main.go:226: CSPFK014I Authenticator setting DEBUG provided by environment
-INFO:  2022/11/20 17:51:05.371259 configuration_factory.go:82: CAKC070 Chosen "authn-jwt" configuration
-INFO:  2022/11/20 17:51:05.371295 main.go:217: CSPFK014I Authenticator setting CONTAINER_MODE provided by annotation conjur.org/container-mode
-INFO:  2022/11/20 17:51:05.371305 main.go:226: CSPFK014I Authenticator setting DEBUG provided by environment
-INFO:  2022/11/20 17:51:05.371316 main.go:226: CSPFK014I Authenticator setting JWT_TOKEN_PATH provided by environment
-INFO:  2022/11/20 17:51:05.371325 main.go:226: CSPFK014I Authenticator setting CONJUR_AUTHN_LOGIN provided by environment
-INFO:  2022/11/20 17:51:05.376197 authenticator_factory.go:34: CAKC075 Chosen "authn-jwt" flow
-INFO:  2022/11/20 17:51:05.420251 k8s_secrets_client.go:56: CSPFK004I Creating Kubernetes client
-INFO:  2022/11/20 17:51:05.420739 k8s_secrets_client.go:21: CSPFK005I Retrieving Kubernetes secret 'db-creds' from namespace 'cityapp'
-INFO:  2022/11/20 17:51:05.438234 authenticator.go:63: CAKC066 Performing authn-jwt
-INFO:  2022/11/20 17:51:05.550677 authenticator.go:83: CAKC035 Successfully authenticated
-INFO:  2022/11/20 17:51:05.550718 conjur_secrets_retriever.go:74: CSPFK003I Retrieving following secrets from DAP/Conjur: [test/CityApp/DBAccount/address test/CityApp/DBAccount/username test/CityApp/DBAccount/password]
-INFO:  2022/11/20 17:51:05.550726 conjur_client.go:21: CSPFK002I Creating DAP/Conjur client
-INFO:  2022/11/20 17:51:05.682514 k8s_secrets_client.go:56: CSPFK004I Creating Kubernetes client
-INFO:  2022/11/20 17:51:05.683098 k8s_secrets_client.go:40: CSPFK006I Updating Kubernetes secret 'db-creds' in namespace 'cityapp'
-INFO:  2022/11/20 17:51:05.690806 provide_conjur_secrets.go:184: CSPFK009I DAP/Conjur Secrets updated in Kubernetes successfully
+INFO:  2026/07/03 14:49:34.323752 entrypoint.go:346: CSPFK014I Authenticator setting LOG_LEVEL provided by environment
+INFO:  2026/07/03 14:49:34.323826 entrypoint.go:346: CSPFK014I Authenticator setting DEBUG provided by environment
+INFO:  2026/07/03 14:49:34.323833 entrypoint.go:89: CSPFK008I CyberArk Secrets Provider for Kubernetes v1.10.0-bcf147d starting up
+INFO:  2026/07/03 14:49:34.323935 entrypoint.go:346: CSPFK014I Authenticator setting LOG_LEVEL provided by environment
+INFO:  2026/07/03 14:49:34.323942 entrypoint.go:346: CSPFK014I Authenticator setting DEBUG provided by environment
+INFO:  2026/07/03 14:49:34.323948 configuration_factory.go:89: CAKC070 Chosen "authn-jwt" configuration
+INFO:  2026/07/03 14:49:34.323964 entrypoint.go:337: CSPFK014I Authenticator setting CONTAINER_MODE provided by annotation conjur.org/container-mode
+INFO:  2026/07/03 14:49:34.323970 entrypoint.go:346: CSPFK014I Authenticator setting DEBUG provided by environment
+INFO:  2026/07/03 14:49:34.323976 entrypoint.go:346: CSPFK014I Authenticator setting LOG_LEVEL provided by environment
+INFO:  2026/07/03 14:49:34.323982 entrypoint.go:346: CSPFK014I Authenticator setting JWT_TOKEN_PATH provided by environment
+INFO:  2026/07/03 14:49:34.323987 entrypoint.go:346: CSPFK014I Authenticator setting CONJUR_AUTHN_LOGIN provided by environment
+INFO:  2026/07/03 14:49:34.324023 entrypoint.go:366: CSPFK012I Secrets Provider setting 'ContainerMode' set by both environment variable 'CONTAINER_MODE' and annotation 'conjur.org/container-mode'
+INFO:  2026/07/03 14:49:34.324582 k8s_secrets_client.go:117: CSPFK004I Creating Kubernetes client
+INFO:  2026/07/03 14:49:34.325252 k8s_secrets_client.go:25: CSPFK005I Retrieving Kubernetes secret 'db-creds' from namespace 'cityapp'
+INFO:  2026/07/03 14:49:34.332495 authenticator_factory.go:34: CAKC075 Chosen "authn-jwt" flow
+INFO:  2026/07/03 14:49:34.332692 authenticator.go:98: CAKC066 Performing authn-jwt
+INFO:  2026/07/03 14:49:34.368538 authenticator.go:118: CAKC035 Successfully authenticated
+INFO:  2026/07/03 14:49:34.368572 conjur_client.go:23: CSPFK002I Creating DAP/Conjur client
+WARN:  2026/07/03 14:49:34.368754 conjur_client_wrapper.go:28: CSPFK090E V2 batch retrieval not available, falling back to V1: V2 Batch Retrieve Secrets API is not supported in Conjur Enterprise/OSS
+INFO:  2026/07/03 14:49:34.388283 k8s_secrets_client.go:117: CSPFK004I Creating Kubernetes client
+INFO:  2026/07/03 14:49:34.388753 k8s_secrets_client.go:48: CSPFK006I Updating Kubernetes secret 'db-creds' in namespace 'cityapp'
+INFO:  2026/07/03 14:49:34.392062 provide_conjur_secrets.go:253: CSPFK009I DAP/Conjur Secrets updated in Kubernetes successfully
 ```
 
 Using browser and go to ```http://<VM-IP>:30082``` to see the result
