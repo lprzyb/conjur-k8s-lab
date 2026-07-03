@@ -441,6 +441,13 @@ INFO:  2022/11/20 17:51:05.690806 provide_conjur_secrets.go:184: CSPFK009I DAP/C
 Using browser and go to ```http://<VM-IP>:30082``` to see the result
 ![cityapp](./images/12.cityapp-conjurtok8ssecret.png)
 
+## Push-to-K8s-Secret, init container variant
+The Secrets Provider is officially documented in two placements - the Sidecar mode above, and an **Init container** mode. ```yaml/cityapp-conjurtok8ssecret-init.yaml``` demonstrates the latter: the exact same push-to-k8s-secret story, but the Secrets Provider runs as a genuine Kubernetes ```initContainers:``` entry instead of a sidecar - it fetches the secret once, to completion, *before* cityapp ever starts, then exits for good rather than staying alive for the pod's lifetime. Neither ```conjur.org/container-mode``` nor ```conjur.org/secrets-refresh-interval``` applies here, since init containers have no ongoing process to put in sidecar mode or refresh on an interval. It reuses the same ServiceAccount, Conjur host identity, RBAC and ```db-creds``` Secret as the sidecar variant above - no new Conjur policy is needed.
+```
+./05.running-cityapp-conjurtok8ssecret-init.sh
+```
+Using browser and go to ```http://<VM-IP>:30085``` to see the result.
+
 # 3.5. Building and running cityapp-springboot
 This is a Java/Spring Boot rewrite of cityapp, built from ```4.cityapp-springboot/build/``` (a Maven project). Its business logic and web page are the same as the PHP cityapp, but it can be deployed two different ways that are worth trying separately.
 

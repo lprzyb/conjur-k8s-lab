@@ -81,16 +81,20 @@
       'blurb' => 'The DB password is a plain Kubernetes env var on the Deployment spec - visible to anyone who can read the pod spec or exec into the container. This is the baseline every other method here improves on.',
     ],
     'push-to-file' => [
-      'title' => 'Conjur Secrets Provider: Push-to-File',
-      'blurb' => 'An init container authenticates to Conjur with a JWT service account token, fetches the secret, and writes it to an in-memory volume as a JSON file the app reads at startup.',
+      'title' => 'Secrets Manager Secrets Provider: Push-to-File',
+      'blurb' => 'An init container authenticates to Secrets Manager with a JWT service account token, fetches the secret, and writes it to an in-memory volume as a JSON file the app reads at startup.',
     ],
     'push-to-k8s-secret' => [
-      'title' => 'Conjur Secrets Provider: Push-to-K8s-Secret',
-      'blurb' => 'Same Secrets Provider mechanism as push-to-file, but it writes the fetched value into a native Kubernetes Secret object instead - so any RBAC-permitted workload can consume it the standard k8s way.',
+      'title' => 'Secrets Manager Secrets Provider: Push-to-K8s-Secret (Sidecar)',
+      'blurb' => 'Same Secrets Provider mechanism as push-to-file, but it writes the fetched value into a native Kubernetes Secret object instead - so any RBAC-permitted workload can consume it the standard k8s way. Runs as a sidecar (conjur.org/container-mode: sidecar) alongside cityapp for the pod\'s whole lifetime.',
+    ],
+    'push-to-k8s-secret-init' => [
+      'title' => 'Secrets Manager Secrets Provider: Push-to-K8s-Secret (Init Container)',
+      'blurb' => 'Same push-to-k8s-secret story as the sidecar variant, but the Secrets Provider runs as a genuine Kubernetes initContainer instead - it fetches the secret once, to completion, before cityapp ever starts, then exits for good. No container-mode or refresh-interval annotation applies to init containers.',
     ],
     'eso' => [
       'title' => 'External Secrets Operator (ESO)',
-      'blurb' => 'ESO syncs the Conjur secret into a native Kubernetes Secret on a schedule, entirely outside this pod. The app itself has zero Conjur awareness - no ServiceAccount, no JWT, no sidecar.',
+      'blurb' => 'ESO syncs the Secrets Manager secret into a native Kubernetes Secret on a schedule, entirely outside this pod. The app itself has zero Secrets Manager awareness - no ServiceAccount, no JWT, no sidecar.',
     ],
     'csi' => [
       'title' => 'Secrets Store CSI Driver',
