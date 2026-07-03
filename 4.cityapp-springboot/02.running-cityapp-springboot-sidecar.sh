@@ -6,19 +6,15 @@ if [[ "$READY" != true ]]; then
     exit
 fi
 
-# This deployment reuses localhost/cityapp-springboot:latest, which only exists
-# if 4.cityapp-springboot/41.building-cityapp-image.sh has actually been run.
-SPRINGBOOT_READY=$(grep -E '^READY=' ../4.cityapp-springboot/00.config.sh | tail -1 | cut -d= -f2)
+# This deployment reuses localhost/cityapp-springboot:latest, built by
+# 01.building-cityapp-springboot-image.sh - run that first if it hasn't
+# been built yet.
 podman image exists localhost/cityapp-springboot:latest
 IMAGE_EXISTS_RC=$?
 
 if [ $IMAGE_EXISTS_RC -ne 0 ]; then
     printf '\033[1;31m❌ Cannot deploy:\033[0m localhost/cityapp-springboot:latest image not found.\n'
-    if [ "$SPRINGBOOT_READY" != true ]; then
-        printf '\033[1;33m➡️  Fix:\033[0m 4.cityapp-springboot/00.config.sh is not READY either - the app has not been built yet. cd ../4.cityapp-springboot, edit 00.config.sh, set READY=true, then run ./41.building-cityapp-image.sh before retrying this script.\n'
-    else
-        printf '\033[1;33m➡️  Fix:\033[0m 4.cityapp-springboot/00.config.sh is already READY, but the image still is not built. cd ../4.cityapp-springboot and run ./41.building-cityapp-image.sh before retrying this script.\n'
-    fi
+    printf '\033[1;33m➡️  Fix:\033[0m run ./01.building-cityapp-springboot-image.sh before retrying this script.\n'
     exit 1
 fi
 
@@ -39,8 +35,11 @@ kubectl -n cityapp create configmap apps-cm \
     --from-literal CONJUR_AUTHN_URL=$CONJUR_AUTHN_URL \
     --from-literal "CONJUR_SSL_CERTIFICATE=${CONJUR_CERT}"
 
-#Update RBAC
-kubectl -n cityapp apply -f yaml/conjurtok8ssecret-rbac.yaml
+#Update RBAC (shared Role/RoleBinding also used by folder 3's
+#cityapp-conjurtok8ssecret/-init - all three write to the same db-creds
+#Secret in the cityapp namespace, so this stays a single source of truth
+#in folder 3 rather than a duplicated copy here)
+kubectl -n cityapp apply -f ../3.cityapp-setup/yaml/conjurtok8ssecret-rbac.yaml
 
 #Delete current deployment
 kubectl -n cityapp get deployments | grep -q $APP_NAME

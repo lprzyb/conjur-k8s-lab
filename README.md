@@ -5,10 +5,11 @@ This project will help you to quickly build up the standalone, single VM lab env
 - Secrets Manager follower in kubernetes
 - k8s jwt authentication
 - Secrets Manager push to k8s file
-- Secrets Manager push to kubernetes secret
+- Secrets Manager push to kubernetes secret (sidecar and init container)
 - native Secrets Manager Spring Boot SDK integration (no sidecar)
 - External Secrets Operator (ESO) integration
 - Secrets Manager CSI provider integration
+- Kubernetes Authenticator Client + Summon integration
 - and other
 
 All setup, installing and configuration steps are all put in sequence of scripts to make the setup process quicker and easier
@@ -36,7 +37,7 @@ Run ```./check-versions.sh``` (needs ```curl``` and ```jq```) any time before re
   - Contact IDIRA local representative for the appliance tarball (e.g. conjur-appliance-Rls-v13.9.0.tar.gz)
   - IDIRA softwares and related tools can be downloaded at https://cyberark-customers.force.com/mplace/s/#software
   - The Secrets Manager CLI is installed automatically by ```2.conjur-setup/06.installing-conjur-cli.sh``` (downloads [conjur-cli-go](https://github.com/cyberark/conjur-cli-go) from GitHub) - no manual download needed
-- Java 17 (needed to build the Spring Boot cityapp in Part III.5 / ```4.cityapp-springboot```): saves time later to install it upfront with ```sudo dnf install -y java-17-openjdk java-17-openjdk-devel``` - not strictly required here, ```4.cityapp-springboot/41.building-cityapp-image.sh``` also installs it automatically if you skip this step
+- Java 17 (needed to build the Spring Boot cityapp in Part III.5 / ```4.cityapp-springboot```): saves time later to install it upfront with ```sudo dnf install -y java-17-openjdk java-17-openjdk-devel``` - not strictly required here, ```4.cityapp-springboot/01.building-cityapp-springboot-image.sh``` also installs it automatically if you skip this step
 
  *The IP addresses in this document are using from current lab environment. Please replace the **172.16.100.109** by your actual **VM IP**’s
     
@@ -103,13 +104,14 @@ This repo is public, so no GitHub auth is needed to clone it.
 cd /opt/lab
 git clone https://github.com/lprzyb/conjur-k8s-lab.git
 ```
-Installation folder contains 6 sub folders for different setup
+Installation folder contains 7 sub folders for different setup
 - 1.k8s-setup: scripts to setup k8s standalone cluster environment
 - 2.conjur-setp: scripts to install podman, mysql, Secrets Manager leader containers and deploying Secrets Manager follower in k8s
-- 3.cityapp-setup: scripts to deploy different types of cityapp application (hardcode, push-to-file, push-to-secret, springboot)
-- 4.cityapp-springboot: builds the Spring Boot cityapp image and deploys it via the native Secrets Manager SDK (no sidecar)
+- 3.cityapp-setup: scripts to deploy different types of cityapp application (hardcode, push-to-file, push-to-secret)
+- 4.cityapp-springboot: builds the Spring Boot cityapp image and deploys it both ways - secrets-provider-for-k8s sidecar and native Secrets Manager SDK
 - 5.conjur-eso: installs and configures the External Secrets Operator
 - 6.conjur-csi: installs and configures the Secrets Manager CSI provider
+- 7.conjur-summon: installs and configures the Kubernetes Authenticator Client + Summon
 
 Each folder will have ```00.config.sh``` which contains some parameters. Review file content, change all related parameters to actual value and set ```READY=true``` before doing further steps.
 
@@ -449,7 +451,7 @@ The Secrets Provider is officially documented in two placements - the Sidecar mo
 Using browser and go to ```http://<VM-IP>:30085``` to see the result.
 
 # 3.5. Building and running cityapp-springboot
-This is a Java/Spring Boot rewrite of cityapp, built from ```4.cityapp-springboot/build/``` (a Maven project). Its business logic and web page are the same as the PHP cityapp, but it can be deployed two different ways that are worth trying separately.
+This is a Java/Spring Boot rewrite of cityapp, built from ```4.cityapp-springboot/build/``` (a Maven project). Its business logic and web page are the same as the PHP cityapp, but it can be deployed two different ways that are worth trying separately. Both the build and both deployment options now live together in ```4.cityapp-springboot/```, for the same reason folder 4 exists at all - everything springboot-specific in one place.
 
 ## Step3.5.1: Building the image
 ```
@@ -458,7 +460,7 @@ vi 00.config.sh
 ```
 Set ```READY=true```, then build the image:
 ```
-./41.building-cityapp-image.sh
+./01.building-cityapp-springboot-image.sh
 ```
 This installs Java 17, runs the Maven build, and tags the result ```cityapp-springboot```. If the build tools aren't available it automatically falls back to pulling a prebuilt image instead, so this step always produces something usable either way.
 
@@ -467,15 +469,13 @@ Both options deploy the same image built above, but as separate Deployments/Serv
 
 **Option A - secrets-provider-for-k8s sidecar** (same mechanism as Step 3.3/3.4 above, just with the Java app instead of PHP):
 ```
-cd /opt/lab/conjur-k8s-lab/3.cityapp-setup
-./06.running-cityapp-springboot.sh
+./02.running-cityapp-springboot-sidecar.sh
 ```
 Using browser and go to ```http://<VM-IP>:30083``` to see the result.
 
 **Option B - native Secrets Manager Spring Boot SDK** (the app itself calls the Secrets Manager API directly at startup via `ConjurSpringDbConfig.java` - no sidecar, no secrets-provider-for-k8s):
 ```
-cd /opt/lab/conjur-k8s-lab/4.cityapp-springboot
-./42.running-cityapp-springboot.sh
+./03.running-cityapp-springboot-native.sh
 ```
 Using browser and go to ```http://<VM-IP>:30088``` to see the result.
 
