@@ -347,6 +347,8 @@ disclaimer describes for a load balancer.
 # PART III: TESTING CITYAPP OPTIONS
 Every demo scenario from here through Part IV is one of the links on the landing page deployed in Part II - shown below for convenience, so you can jump between demos without scrolling back and forth. That's optional though: every step below also gives its own standalone URL, which works whether or not you ever open the landing page.
 
+New to DevOps or Kubernetes? [explain-use-cases.md](./explain-use-cases.md) walks through all 9 methods below in plain English - analogies, diagrams, and the actual code responsible for each one - before you dive into running them yourself.
+
 <img src="./images/05.landing-page-idira.png" alt="landingpage" width="75%">
 
 # 3.1. Building cityapp image
