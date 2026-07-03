@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 source 00.config.sh
 
 if [[ "$READY" != true ]]; then
