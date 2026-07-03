@@ -14,13 +14,13 @@ YML_TEMP="/tmp/$APP_NAME.yaml"
 set -x
 
 #Delete current deployment
-kubectl -n $ESO_NS get deployments | grep -q $APP_NAME
+kubectl -n $ESO_NS get deployment $APP_NAME >/dev/null 2>&1
 if [ $? -eq 0 ]; then
     kubectl -n $ESO_NS delete deployment $APP_NAME
     ret=0
     until [ $ret -ne 0 ]
     do
-        kubectl -n $ESO_NS get deployments | grep -q $APP_NAME
+        kubectl -n $ESO_NS get deployment $APP_NAME >/dev/null 2>&1
         ret=$?
         echo "Waiting deployment is deleted..."
         sleep 1

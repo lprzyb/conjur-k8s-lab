@@ -13,13 +13,13 @@ kubectl create configmap landing-page-html \
     --from-file=index.html=yaml/landing-page.html \
     --from-file=matrix.html=yaml/rotation-matrix.html
 
-kubectl get deployments | grep -q landing-page
+kubectl get deployment landing-page >/dev/null 2>&1
 if [ $? -eq 0 ]; then
     kubectl delete deployment landing-page
     ret=0
     until [ $ret -ne 0 ]
     do
-        kubectl get deployments | grep -q landing-page
+        kubectl get deployment landing-page >/dev/null 2>&1
         ret=$?
         echo "Waiting deployment is deleted..."
         sleep 1

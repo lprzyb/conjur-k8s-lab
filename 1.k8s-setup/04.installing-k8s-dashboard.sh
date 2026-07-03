@@ -8,13 +8,13 @@ fi
 
 set -x
 APP_NAME="dashboard-metrics-scraper"
-kubectl -n kubernetes-dashboard get deployments | grep -q $APP_NAME
+kubectl -n kubernetes-dashboard get deployment $APP_NAME >/dev/null 2>&1
 if [ $? -eq 0 ]; then
     kubectl -n kubernetes-dashboard delete deployment $APP_NAME
     ret=0
     until [ $ret -ne 0 ]
     do
-        kubectl -n kubernetes-dashboard get deployments | grep -q $APP_NAME
+        kubectl -n kubernetes-dashboard get deployment $APP_NAME >/dev/null 2>&1
         ret=$?
         echo "Waiting deployment is deleted..."
         sleep 1
@@ -23,13 +23,13 @@ if [ $? -eq 0 ]; then
 fi
 
 APP_NAME="kubernetes-dashboard"
-kubectl -n kubernetes-dashboard get deployments | grep -q $APP_NAME
+kubectl -n kubernetes-dashboard get deployment $APP_NAME >/dev/null 2>&1
 if [ $? -eq 0 ]; then
     kubectl -n kubernetes-dashboard delete deployment $APP_NAME
     ret=0
     until [ $ret -ne 0 ]
     do
-        kubectl -n kubernetes-dashboard get deployments | grep -q $APP_NAME
+        kubectl -n kubernetes-dashboard get deployment $APP_NAME >/dev/null 2>&1
         ret=$?
         echo "Waiting deployment is deleted..."
         sleep 1

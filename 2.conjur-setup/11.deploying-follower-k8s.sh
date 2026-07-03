@@ -10,13 +10,13 @@ fi
 set -x
 
 #Delete current deployment
-kubectl -n conjur get deployments | grep -q follower
+kubectl -n conjur get deployment follower >/dev/null 2>&1
 if [ $? -eq 0 ]; then
     kubectl -n conjur delete deployment follower
     ret=0
     until [ $ret -ne 0 ]
     do
-        kubectl -n conjur get deployments | grep -q follower
+        kubectl -n conjur get deployment follower >/dev/null 2>&1
         ret=$?
         echo "Waiting deployment is deleted..."
         sleep 1

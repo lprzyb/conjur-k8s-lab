@@ -26,13 +26,13 @@ kubectl -n cityapp create configmap apps-cm \
     --from-literal "CONJUR_SSL_CERTIFICATE=${CONJUR_CERT}"
 
 #Delete current deployment
-kubectl -n cityapp get deployments | grep -q $APP_NAME
+kubectl -n cityapp get deployment $APP_NAME >/dev/null 2>&1
 if [ $? -eq 0 ]; then
     kubectl -n cityapp delete deployment $APP_NAME
     ret=0
     until [ $ret -ne 0 ]
     do
-        kubectl -n cityapp get deployments | grep -q $APP_NAME
+        kubectl -n cityapp get deployment $APP_NAME >/dev/null 2>&1
         ret=$?
         echo "Waiting deployment is deleted..."
         sleep 1
