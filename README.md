@@ -100,7 +100,7 @@ This repo is public, so no GitHub auth is needed to clone it.
 cd /opt/lab
 git clone https://github.com/lprzyb/conjur-k8s-lab.git
 ```
-Installation folder contains 7 sub folders for different setup
+Installation folder contains 8 sub folders for different setup
 - 1.k8s-setup: scripts to setup k8s standalone cluster environment
 - 2.conjur-setp: scripts to install podman, mysql, Secrets Manager leader containers and deploying Secrets Manager follower in k8s
 - 3.cityapp-setup: scripts to deploy different types of cityapp application (hardcode, push-to-file, push-to-secret)
@@ -108,6 +108,7 @@ Installation folder contains 7 sub folders for different setup
 - 5.conjur-eso: installs and configures the External Secrets Operator
 - 6.conjur-csi: installs and configures the Secrets Manager CSI provider
 - 7.conjur-summon: installs and configures the Kubernetes Authenticator Client + Summon
+- 8.rotate-password: PART IV's password rotation script and the redeploy-helper for the apps that don't pick it up live
 
 Each folder will have ```00.config.sh``` which contains some parameters. Review file content, change all related parameters to actual value and set ```READY=true``` before doing further steps.
 
@@ -618,10 +619,14 @@ This is the actual payoff of the whole lab: rotate the real database password on
 
 ## Step4.1: Rotate the real password (test/host1/*)
 ```
-cd /opt/lab/conjur-k8s-lab/2.conjur-setup
-./13.rotating-db-password.sh
+cd /opt/lab/conjur-k8s-lab/8.rotate-password
+vi 00.config.sh
 ```
-Changes the actual MySQL password and updates ```test/host1/pass``` in Secrets Manager - ```test/host2/pass``` is deliberately left untouched (see Step4.2). Refresh each cityapp page after ~30-60 seconds, or open the rotation matrix below to watch all of them at once:
+Set ```READY=true``` to continue - this folder reuses the same ```2.conjur-setup/00.config.sh``` values.
+```
+./01.rotating-db-password.sh
+```
+Changes the actual MySQL password and updates ```test/host1/pass``` in Secrets Manager - ```test/host2/pass``` is deliberately left untouched (see Step4.3). Refresh each cityapp page after ~30-60 seconds, or open the rotation matrix below to watch all of them at once:
 ```
 http://<VM-IP>:30001/matrix.html
 ```
@@ -638,25 +643,31 @@ http://<VM-IP>:30001/matrix.html
 | cityapp-csi | 30086 | 🔁 Needs a redeploy |
 | cityapp-summon | 30087 | 🔁 Needs a redeploy |
 | cityapp-hardcode | 30080 | ❌ Broken - by design, see below |
-| cityapp-eso | 30084 | ❌ Broken until Step4.2 or Step4.3 |
+| cityapp-eso | 30084 | ❌ Broken until Step4.3 or Step4.4 |
 
 <details>
 <summary>Why does each app behave this way?</summary>
 
 - **Live, no redeploy**: both read the secret from a shared volume (a file or a K8s Secret) that the secrets-provider sidecar keeps refreshing on its own interval - the app just reads whatever's currently there on every page load.
 - **Needs a redeploy**: each of these fetches the secret exactly once and has no ongoing refresh process afterward, just for different reasons per method - ```conjurtok8ssecret-init```'s Secrets Provider is a true initContainer that exits after running once; ```springboot-sidecar```'s password is wired up as a `secretKeyRef` **env var**, which Kubernetes captures once at pod start even though the sidecar keeps the underlying Secret current; ```springboot-native``` fetches once via the Secrets Manager SDK at Spring startup; this lab's CSI driver install doesn't have secret rotation enabled, so the mounted volume is fetched once at mount time; and Summon fetches once, then ```exec```s into cityapp's own process, leaving nothing running afterward to refetch anything.
-- **Broken by design**: ```cityapp-hardcode``` never talks to Secrets Manager at all, so it can never see a rotated password. ```cityapp-eso``` reads ```test/host2/*```, a separate copy of the credentials that Step4.1 intentionally does not touch - see Step4.2 to repair it.
+- **Broken by design**: ```cityapp-hardcode``` never talks to Secrets Manager at all, so it can never see a rotated password. ```cityapp-eso``` reads ```test/host2/*```, a separate copy of the credentials that Step4.1 intentionally does not touch - see Step4.3 to repair it.
 </details>
 
-## Step4.2 (optional): Repair cityapp-eso
+## Step4.2: Redeploy the apps that don't update live
 ```
-./13.rotating-db-password.sh host2
+./02.redeploying-rotated-apps.sh
+```
+Redeploys all 5 "needs a redeploy" apps from the table above in one step. Each one lives in a different folder, and each folder's own deploy script only works with that folder as the current directory (```source 00.config.sh```, ```yaml/...``` are relative paths) - so this script ```cd```s into each one internally before calling it. That also means it only works run from inside ```8.rotate-password/``` itself, the same as every other script in this lab - don't try to call it, or the scripts it wraps, from a different folder directly.
+
+## Step4.3 (optional): Repair cityapp-eso
+```
+./01.rotating-db-password.sh host2
 ```
 No new password, no MySQL change - just copies ```test/host1/pass```'s current value into ```test/host2/pass```. ```cityapp-eso``` picks it up on its own ESO sync schedule.
 
-## Step4.3 (alternative to Step4.1 + Step4.2): Rotate both together
+## Step4.4 (alternative to Step4.1): Rotate both together
 ```
-./13.rotating-db-password.sh all
+./01.rotating-db-password.sh all
 ```
-Same MySQL rotation as Step4.1, but updates ```test/host1/pass``` and ```test/host2/pass``` together in one step - only ```cityapp-hardcode``` is left stuck on the old password.
+Same MySQL rotation as Step4.1, but updates ```test/host1/pass``` and ```test/host2/pass``` together in one step - only ```cityapp-hardcode``` is left stuck on the old password. Still run Step4.2 afterward for the same 5 apps - ```all``` mode rotates the real password too, it just also keeps ```cityapp-eso``` in sync at the same time.
 # --- LAB END ---
