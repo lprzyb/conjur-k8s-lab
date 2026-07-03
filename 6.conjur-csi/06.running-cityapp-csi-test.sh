@@ -8,7 +8,7 @@ if [[ "$READY" != true ]]; then
 fi
 
 APP_NAME="cityapp-csi"
-YML_FILE="yaml/05.$APP_NAME.yaml"
+YML_FILE="yaml/06.$APP_NAME.yaml"
 YML_TEMP="/tmp/05.$APP_NAME.yaml"
 
 set -x

@@ -13,7 +13,7 @@ set +x
 
 if [ $RC1 -eq 0 ]; then
     printf '\033[1;32m✅ Done:\033[0m cityapp-summon host loaded into Secrets Manager, granted read/execute on test/host1/*.\n'
-    printf '\033[1;33m➡️  Next:\033[0m run ./01.building-cityapp-summon-image.sh\n'
+    printf '\033[1;33m➡️  Next:\033[0m run ./02.building-cityapp-summon-image.sh\n'
 else
     printf '\033[1;31m❌ Failed:\033[0m policy load failed - check the output above.\n'
 fi

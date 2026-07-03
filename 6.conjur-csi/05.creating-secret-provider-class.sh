@@ -10,7 +10,7 @@ fi
 CONJUR_FOLLOWER_URL="https://follower.conjur.svc.cluster.local"
 CONJUR_CERT="$(openssl s_client -showcerts -connect  $CONJUR_LEADER_HOST:443 </dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p')"
 
-YML_FILE="./yaml/04.conjur-csi-provider-class-config.yaml"
+YML_FILE="./yaml/05.conjur-csi-provider-class-config.yaml"
 YML_TEMP="/tmp/$(date +%s).yaml"
 
 OBJ_TYPE=" SecretProviderClass"
@@ -54,7 +54,7 @@ kubectl -n $OBJ_NS describe $OBJ_TYPE $OBJ_NAME
 set +x
 if [ $RC -eq 0 ]; then
     printf '\033[1;32m✅ Done:\033[0m %s created in namespace %s.\n' "$OBJ_NAME" "$OBJ_NS"
-    printf '\033[1;33m➡️  Next:\033[0m run ./05.running-cityapp-csi-test.sh\n'
+    printf '\033[1;33m➡️  Next:\033[0m run ./06.running-cityapp-csi-test.sh\n'
 else
     printf '\033[1;31m❌ Failed:\033[0m SecretProviderClass creation failed (exit %s) - check the output above.\n' "$RC"
 fi

@@ -491,37 +491,37 @@ Set ```READY=true``` to continue - this folder reuses the same ```2.conjur-setup
 
 ## Step3A.2: Installing ESO
 ```
-./00.installing-eso-helm.sh
+./01.installing-eso-helm.sh
 ```
 Installs Helm if missing, then the ```external-secrets``` Helm chart into its own namespace.
 
 ## Step3A.3: Loading the ESO Secrets Manager policy
 ```
-./01.adding-conjur-eso-policy.sh
+./02.adding-conjur-eso-policy.sh
 ```
 Grants the ESO service account JWT authentication access, and sets a second demo variable set (```test/host2/host```, ```test/host2/user```, ```test/host2/pass```) to the same working database credentials used elsewhere in the lab.
 
 ## Step3A.4: Creating the Secrets Manager SecretStore
 ```
-./02.creating-ext-secret-store.sh
+./03.creating-ext-secret-store.sh
 ```
 Registers Secrets Manager as an ESO ```SecretStore``` using JWT auth against the Secrets Manager follower.
 
 ## Step3A.5: Creating the ExternalSecret
 ```
-./03.creating-eso-secret.sh
+./04.creating-eso-secret.sh
 ```
 Tells ESO to sync ```test/host2/*``` into a native Kubernetes Secret named ```conjur-secret```.
 
 ## Step3A.6: Verifying the synced secret
 ```
-./04.getting-eso-secret.sh
+./05.getting-eso-secret.sh
 ```
 Prints the ```ExternalSecret``` sync status and the decoded contents of ```conjur-secret```.
 
 ## Step3A.7: Running cityapp-eso
 ```
-./05.running-cityapp-eso.sh
+./06.running-cityapp-eso.sh
 ```
 Deploys the same ```cityapp``` PHP image built in Part III, unmodified, mounting ```conjur-secret``` directly at ```/etc/secret-volume```. Using browser and go to ```http://<VM-IP>:30084``` to see the result - the page will show the secret source as "K8S SECRETS", same as ```cityapp-conjurtok8ssecret```, but this Secret was populated by ESO rather than a sidecar.
 
@@ -537,37 +537,37 @@ Set ```READY=true``` to continue. This folder reuses ```2.conjur-setup/00.config
 
 ## Step3B.2: Installing the Secrets Store CSI Driver
 ```
-./00.installing-csi-helm.sh
+./01.installing-csi-helm.sh
 ```
 Installs Helm if missing, then the ```secrets-store-csi-driver``` chart into ```kube-system```.
 
 ## Step3B.3: Loading the CSI Secrets Manager policy
 ```
-./01.adding-conjur-csi-jwt-policy.sh
+./02.adding-conjur-csi-jwt-policy.sh
 ```
 Defines a second, CSI-specific JWT authenticator (```authn-jwt/k8s-csi```, distinct from the ```authn-jwt/k8s``` used everywhere else) and its host identity.
 
 ## Step3B.4: Redeploying the Secrets Manager follower with CSI support
 ```
-./02.redeploy-follower-with-k8s-csi.sh
+./03.redeploy-follower-with-k8s-csi.sh
 ```
 Replaces the follower deployed in Part II with one that has both ```authn-jwt/k8s``` and ```authn-jwt/k8s-csi``` enabled.
 
 ## Step3B.5: Installing the Secrets Manager CSI provider
 ```
-./03.installing-conjur-csi-provider.sh
+./04.installing-conjur-csi-provider.sh
 ```
 Installs IDIRA's ```conjur-k8s-csi-provider``` Helm chart into ```kube-system```.
 
 ## Step3B.6: Creating the SecretProviderClass
 ```
-./04.creating-secret-provider-class.sh
+./05.creating-secret-provider-class.sh
 ```
 Creates a ```SecretProviderClass``` named ```conjur-credentials``` in the ```cityapp``` namespace, pointing at the Conjur follower.
 
 ## Step3B.7: Running cityapp-csi
 ```
-./05.running-cityapp-csi-test.sh
+./06.running-cityapp-csi-test.sh
 ```
 Deploys ```cityapp-csi```, mounting secrets via the CSI volume at ```/etc/secret-volume``` (resolved from ```test/host1/*```, the same working demo credentials used since Part II). Using browser and go to ```http://<VM-IP>:30086``` to see the result.
 
@@ -583,19 +583,19 @@ Set ```READY=true``` to continue - this folder reuses the same ```2.conjur-setup
 
 ## Step3C.2: Loading the Summon Secrets Manager policy
 ```
-./00.adding-conjur-summon-policy.sh
+./01.adding-conjur-summon-policy.sh
 ```
 Adds a ```cityapp-summon``` host to the existing ```authn-jwt/k8s``` authenticator and grants it read/execute on ```test/host1/*``` - the same working demo credentials used since Part II. Like ESO's policy in Part III-A, this is a self-contained addition and does not modify ```2.conjur-setup/policies/authn-jwt-k8s.yaml```.
 
 ## Step3C.3: Building the cityapp-summon image
 ```
-./01.building-cityapp-summon-image.sh
+./02.building-cityapp-summon-image.sh
 ```
 Builds ```localhost/cityapp:summon``` on top of ```localhost/cityapp:php``` (Part III's image must be built first) - adds the Summon binary and the ```summon-conjur``` provider, and overrides the entrypoint to ```summon -f /etc/summon/secrets.yml apache2-foreground```.
 
 ## Step3C.4: Running cityapp-summon
 ```
-./02.running-cityapp-summon.sh
+./03.running-cityapp-summon.sh
 ```
 Deploys ```cityapp-summon``` with the authenticator sidecar. Using browser and go to ```http://<VM-IP>:30087``` to see the result - the page will show the secret source as "ENVIRONMENT", same as ```cityapp-hardcode```, but here the values were fetched live from Secrets Manager rather than baked into the Deployment spec.
 

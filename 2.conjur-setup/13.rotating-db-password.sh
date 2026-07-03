@@ -26,7 +26,7 @@ esac
 # cityapp-summon all read test/host1/* and keep working (live, or after a
 # redeploy - see README.md PART IV for exactly which apps need which).
 # cityapp-eso reads the separate test/host2/* copy (see
-# 5.conjur-eso/01.adding-conjur-eso-policy.sh) and is intentionally left
+# 5.conjur-eso/02.adding-conjur-eso-policy.sh) and is intentionally left
 # behind here, right alongside cityapp-hardcode which never talks to
 # Secrets Manager at all - both go stale, everything else survives the rotation.
 # Pass "host2" to repair just cityapp-eso afterward without a fresh

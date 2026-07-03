@@ -7,12 +7,12 @@ spec:
   provider: conjur
   parameters:
     # 0.2.0+ ignores the "secrets" parameter here - it moves to the
-    # conjur.org/secrets pod annotation instead, see yaml/05.cityapp-csi.yaml
+    # conjur.org/secrets pod annotation instead, see yaml/06.cityapp-csi.yaml
     conjur.org/configurationVersion: 0.2.0
     account: '{CONJUR_ACCOUNT}'
     applianceUrl: '{CONJUR_URL}'
     authnId: authn-jwt/k8s-csi
     identity: host/jwt-apps/k8s-csi/k8s-csi-host
     # sslCertificate value gets appended below this line by
-    # 04.creating-secret-provider-class.sh - keep this the last parameter
+    # 05.creating-secret-provider-class.sh - keep this the last parameter
     sslCertificate: |

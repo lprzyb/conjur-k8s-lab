@@ -143,19 +143,19 @@ pinned "Spring Boot" "$springboot_current" "OSS EOL since 2023-06-30, known tech
 
 # --- 5.conjur-eso ------------------------------------------------------------
 
-eso_current=$(grep -oE -- "--version [0-9.]+" 5.conjur-eso/00.installing-eso-helm.sh | awk '{print $2}')
+eso_current=$(grep -oE -- "--version [0-9.]+" 5.conjur-eso/01.installing-eso-helm.sh | awk '{print $2}')
 eso_latest=$(github_latest_tag external-secrets/external-secrets | sed 's/^helm-chart-//')
-report "external-secrets Helm chart" "$eso_current" "$eso_latest" "5.conjur-eso/00.installing-eso-helm.sh"
+report "external-secrets Helm chart" "$eso_current" "$eso_latest" "5.conjur-eso/01.installing-eso-helm.sh"
 
 # --- 6.conjur-csi ------------------------------------------------------------
 
-csidriver_current=$(grep -m1 -oE -- "--version [0-9.]+" 6.conjur-csi/00.installing-csi-helm.sh | awk '{print $2}')
+csidriver_current=$(grep -m1 -oE -- "--version [0-9.]+" 6.conjur-csi/01.installing-csi-helm.sh | awk '{print $2}')
 csidriver_latest=$(helm_repo_latest https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts/index.yaml secrets-store-csi-driver)
-report "secrets-store-csi-driver Helm chart" "$csidriver_current" "$csidriver_latest" "6.conjur-csi/00.installing-csi-helm.sh"
+report "secrets-store-csi-driver Helm chart" "$csidriver_current" "$csidriver_latest" "6.conjur-csi/01.installing-csi-helm.sh"
 
-csiprovider_current=$(grep -m1 -oE -- "--version [0-9.]+" 6.conjur-csi/03.installing-conjur-csi-provider.sh | awk '{print $2}')
+csiprovider_current=$(grep -m1 -oE -- "--version [0-9.]+" 6.conjur-csi/04.installing-conjur-csi-provider.sh | awk '{print $2}')
 csiprovider_latest=$(helm_repo_latest https://cyberark.github.io/helm-charts/index.yaml conjur-k8s-csi-provider)
-report "conjur-k8s-csi-provider Helm chart" "$csiprovider_current" "$csiprovider_latest" "6.conjur-csi/03.installing-conjur-csi-provider.sh"
+report "conjur-k8s-csi-provider Helm chart" "$csiprovider_current" "$csiprovider_latest" "6.conjur-csi/04.installing-conjur-csi-provider.sh"
 
 # --- 7.conjur-summon ---------------------------------------------------------
 

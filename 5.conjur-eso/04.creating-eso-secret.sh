@@ -20,7 +20,7 @@ kubectl -n external-secrets describe externalsecret conjur
 set +x
 if [ $RC -eq 0 ]; then
     printf '\033[1;32m✅ Done:\033[0m conjur ExternalSecret created in namespace %s.\n' "$ESO_NS"
-    printf '\033[1;33m➡️  Next:\033[0m run ./04.getting-eso-secret.sh\n'
+    printf '\033[1;33m➡️  Next:\033[0m run ./05.getting-eso-secret.sh\n'
 else
     printf '\033[1;31m❌ Failed:\033[0m ExternalSecret creation failed (exit %s) - check the output above.\n' "$RC"
 fi

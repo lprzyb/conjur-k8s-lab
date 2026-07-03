@@ -41,7 +41,7 @@ CHART_RC=$?
 set +x
 if [ $CHART_RC -eq 0 ]; then
     printf '\033[1;32m✅ Done:\033[0m conjur-csi-provider Helm chart installed.\n'
-    printf '\033[1;33m➡️  Next:\033[0m run ./04.creating-secret-provider-class.sh\n'
+    printf '\033[1;33m➡️  Next:\033[0m run ./05.creating-secret-provider-class.sh\n'
 else
     printf '\033[1;31m❌ Failed:\033[0m conjur-csi-provider Helm chart is not installed - check the output above.\n'
 fi
