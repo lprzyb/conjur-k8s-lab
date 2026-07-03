@@ -45,7 +45,7 @@ Run ```./check-versions.sh``` (needs ```curl``` and ```jq```) any time before re
 ## **Step1.2.1: Preparing Rocky Linux 9**
 Rocky Linux 9 can be downloaded at https://rockylinux.org/download - grab the latest 9.x Minimal ISO.
 
-![rocky](./images/01.rocky-download.png)
+<img src="./images/01.rocky-download.png" alt="rocky" width="75%">
 
 Create the VM and install with the minimal install option.
 
@@ -176,11 +176,11 @@ Open browser and login to k8s dashboard using previous copied token
 https://<VMIP>:30443
 ```
 
-![k8sd1](./images/03.k8s-dashboard1.png)
+<img src="./images/03.k8s-dashboard1.png" alt="k8sd1" width="75%">
 
 Select kube-system namespace and review some of the data in dashboard
 
-![k8sd2](./images/04.k8s-dashboard2.png)
+<img src="./images/04.k8s-dashboard2.png" alt="k8sd2" width="75%">
 
 ## **Step2.1.5: Deploying the demo landing page**
 ```
@@ -191,7 +191,7 @@ Deploys a single static page (plain HTML/CSS, no JS framework) with links to eve
 http://<VM-IP>:30001
 ```
 
-![landingpagedemo](./images/05.landing-page-demo-idira.png)
+<img src="./images/05.landing-page-demo-idira.png" alt="landingpagedemo" width="75%">
 
 # 2.2. Setting up podman and Secrets Manager environment
 ## **Step2.2.1: Reviewing 00.config.sh**
@@ -231,7 +231,7 @@ Using browser and put in Secrets Manager leader URL ```https://<VMIP>```, login 
 https://<VM-IP>/
 ```
 
-![idirasmgui](./images/05.idira-sm-gui.png)
+<img src="./images/05.idira-sm-gui.png" alt="idirasmgui" width="75%">
 
 ## **Step2.2.5: Installing Secrets Manager CLI**
 ```
@@ -280,7 +280,7 @@ Using browser, login to Secrets Manager GUI to review the demo data and content.
 - conjur/authn-jwt/k8s/issuer: jwt issuer, should be ```https://kubernetes.default.svc.cluster.local``` by default
 - conjur/authn-jwt/k8s/public-keys: k8s public key information, should be in json format.
 
-![idirasmdata](./images/06.idira-sm-data.png)
+<img src="./images/06.idira-sm-data.png" alt="idirasmdata" width="75%">
 
 If any of above parameters is emply, please run script ```./09.loading-conjur-jwt-data.sh``` again.
 
@@ -291,10 +291,10 @@ If any of above parameters is emply, please run script ```./09.loading-conjur-jw
 ```
 Login to k8s dashboard, select namespace conjur and checking for follower deployment and pod status
 
-![idirafollowercm](./images/07.k8s-follower-cm-data.png)
+<img src="./images/07.k8s-follower-cm-data.png" alt="idirafollowercm" width="75%">
 
 Login to Secrets Manager GUI, go to ```seting>Secrets Manager Cluster``` to check for follower status
-![idiracmfollower](./images/08.idira-cm-follower.png)
+<img src="./images/08.idira-cm-follower.png" alt="idiracmfollower" width="75%">
 
 Using command ```curl -k https://<VM-IP>:30444/info``` to check for follower detai info
 ```
@@ -346,7 +346,7 @@ disclaimer describes for a load balancer.
 # PART III: TESTING CITYAPP OPTIONS
 Every demo scenario from here through Part IV is one of the links on the landing page deployed in Part II - shown below for convenience, so you can jump between demos without scrolling back and forth. That's optional though: every step below also gives its own standalone URL, which works whether or not you ever open the landing page.
 
-![landingpage](./images/05.landing-page-idira.png)
+<img src="./images/05.landing-page-idira.png" alt="landingpage" width="75%">
 
 # 3.1. Building cityapp image
 ## **Step3.1.1: Reviewing 00.config.sh**
@@ -372,18 +372,18 @@ Using command ```podman image ls | grep cityapp``` to make sure cityapp image ha
 ```
 Using browser and access to ```http://<VM-IP>:30080``` to open cityapp-hardcode webapp for the result
 
-![cityapp](./images/09.cityapp-hardcode-idira.png)
+<img src="./images/09.cityapp-hardcode-idira.png" alt="cityapp" width="75%">
 
 Using k8s dashboard GUI and select cityapp namespace to see more detail on cityapp-hardcode pod. This application is being run with database credentials from environment parameters.
 
-![cityapp](./images/10.cityapp-hardcode-pod-idira.png)
+<img src="./images/10.cityapp-hardcode-pod-idira.png" alt="cityapp" width="75%">
 
 # 3.3. Running cityapp-conjurtok8sfile
 Application cityapp-conjurtok8sfile is configured with sidecar container (secrets-provider-for-k8s) which is run in the same pod with cityapp. The sidecar will connect to conjur follower pod, using jwt authentication method and check for database credentials. Information will then be written into ```/conjur/secret``` folder and linked to cityapp's ```/conjur``` folder using shared volume. The architecture of this method is described at below IDIRA document link.
 
 [IDIRA Secret Provider: Push to File mode](https://docs.cyberark.com/Product-Doc/OnlineHelp/AAM-DAP/Latest/en/Content/Integrations/k8s-ocp/cjr-k8s-secrets-provider-ic-p2f.htm?TocPath=Integrations%7COpenShift%2FKubernetes%7CSet%20up%20applications%7CSecrets%20Provider%20for%20Kubernetes%7CInit%20container%7C_____2 "Push to file")
 
-![push2file](https://github.com/cyberark/secrets-provider-for-k8s/raw/main/assets/how-push-to-file-works.png)
+<img src="https://github.com/cyberark/secrets-provider-for-k8s/raw/main/assets/how-push-to-file-works.png" alt="push2file" width="75%">
 
 To deploy conjurtok8sfile application, run:
 ```
@@ -408,14 +408,14 @@ INFO:  2022/11/20 17:29:18.560742 provide_conjur_secrets.go:126: CSPFK015I DAP/C
 ```
 
 Using browser and go to ```http://<VM-IP>:30081``` to see the result
-![cityapp](./images/11.cityapp-conjurtok8sfile-idira.png)
+<img src="./images/11.cityapp-conjurtok8sfile-idira.png" alt="cityapp" width="75%">
 
 # 3.4. Running cityapp-conjurtok8ssecret
 Application cityapp-conjurtok8ssecret is configured with a secrets-provider-for-k8s container in the same pod as cityapp (a sidecar - `conjur.org/container-mode: sidecar` plus `CONTAINER_MODE: init` on the provider container is the officially documented combination for this mode, see IDIRA's own Sidecar-tab example at the link below - `CONTAINER_MODE: init` here does not mean "runs once and exits"). It connects to the conjur follower pod using the jwt authentication method, fetches the database credentials, and keeps pushing them into kubernetes secret name ```db-creds``` (configured in the application's namespace, needs RBAC configuration to allow the update method on k8s secrets) on the interval set by ```conjur.org/secrets-refresh-interval```. When cityapp's main container running, it will access to secret content via files in /etc/secret-volume which is the shared volume that is linked to secret ```db-creds``` - since that's a K8s Secret **volume mount**, its content stays in sync automatically as the sidecar keeps updating ```db-creds```. The architecture of this method is described at below IDIRA document link.
 
 [IDIRA Secret Provider: Kubernetes Secret mode](https://docs.cyberark.com/Product-Doc/OnlineHelp/AAM-DAP/Latest/en/Content/Integrations/k8s-ocp/cjr-k8s-secrets-provider-ic.htm?tocpath=Integrations%7COpenShift%252FKubernetes%7CApp%20owner%253A%20Set%20up%20workloads%20in%20Kubernetes%7CSet%20up%20workloads%20(cert-based%20authn)%7CSecrets%20Provider%20for%20Kubernetes%7CInit%20container%252FSidecar%7C_____1 "Push to secret")
 
-![push2k8s](./images/cj-push2secrets.png)
+<img src="./images/cj-push2secrets.png" alt="push2k8s" width="75%">
 
 ```
 ./04.running-cityapp-conjurtok8ssecret.sh
@@ -443,7 +443,7 @@ INFO:  2022/11/20 17:51:05.690806 provide_conjur_secrets.go:184: CSPFK009I DAP/C
 ```
 
 Using browser and go to ```http://<VM-IP>:30082``` to see the result
-![cityapp](./images/12.cityapp-conjurtok8ssecret-idira.png)
+<img src="./images/12.cityapp-conjurtok8ssecret-idira.png" alt="cityapp" width="75%">
 
 ## Push-to-K8s-Secret, init container variant
 The Secrets Provider is officially documented in two placements - the Sidecar mode above, and an **Init container** mode. ```yaml/cityapp-conjurtok8ssecret-init.yaml``` demonstrates the latter: the exact same push-to-k8s-secret story, but the Secrets Provider runs as a genuine Kubernetes ```initContainers:``` entry instead of a sidecar - it fetches the secret once, to completion, *before* cityapp ever starts, then exits for good rather than staying alive for the pod's lifetime. Neither ```conjur.org/container-mode``` nor ```conjur.org/secrets-refresh-interval``` applies here, since init containers have no ongoing process to put in sidecar mode or refresh on an interval. It reuses the same ServiceAccount, Conjur host identity, RBAC and ```db-creds``` Secret as the sidecar variant above - no new Conjur policy is needed.
@@ -481,7 +481,7 @@ Using browser and go to ```http://<VM-IP>:30083``` to see the result.
 ```
 Using browser and go to ```http://<VM-IP>:30088``` to see the result.
 
-![cityappspringbootnative](./images/13.cityapp-springboot-native-idira.png)
+<img src="./images/13.cityapp-springboot-native-idira.png" alt="cityappspringbootnative" width="75%">
 
 # PART III-A: TESTING EXTERNAL SECRETS OPERATOR (ESO)
 Unlike the sidecar-based variants above, this section shows secrets flowing into Kubernetes from *outside* the pod entirely: the [External Secrets Operator](https://external-secrets.io/latest/) (ESO) authenticates to Secrets Manager on its own and syncs a value into a native Kubernetes Secret, and the app that consumes it needs no Secrets Manager awareness at all - no sidecar, no ServiceAccount, no JWT token.
@@ -529,7 +529,7 @@ Prints the ```ExternalSecret``` sync status and the decoded contents of ```conju
 ```
 Deploys the same ```cityapp``` PHP image built in Part III, unmodified, mounting ```conjur-secret``` directly at ```/etc/secret-volume```. Using browser and go to ```http://<VM-IP>:30084``` to see the result - the page will show the secret source as "K8S SECRETS", same as ```cityapp-conjurtok8ssecret```, but this Secret was populated by ESO rather than a sidecar.
 
-![cityappeso](./images/14.cityapp-eso-idira.png)
+<img src="./images/14.cityapp-eso-idira.png" alt="cityappeso" width="75%">
 
 # PART III-B: TESTING THE CONJUR CSI PROVIDER
 A third way to deliver secrets into a pod: the [Kubernetes Secrets Store CSI Driver](https://kubernetes-csi.github.io/docs/) mounts them directly as a volume, resolved live by IDIRA's Secrets Manager CSI provider at mount time. The provider authenticates using an explicit identity rather than auto-resolving one from JWT claims, so - like ESO - the app itself needs no ServiceAccount token projection, sidecar, or Secrets Manager awareness.
@@ -577,7 +577,7 @@ Creates a ```SecretProviderClass``` named ```conjur-credentials``` in the ```cit
 ```
 Deploys ```cityapp-csi```, mounting secrets via the CSI volume at ```/etc/secret-volume``` (resolved from ```test/host1/*```, the same working demo credentials used since Part II). Using browser and go to ```http://<VM-IP>:30086``` to see the result.
 
-![cityappcsi](./images/15.cityapp-csi-idira.png)
+<img src="./images/15.cityapp-csi-idira.png" alt="cityappcsi" width="75%">
 
 # PART III-C: TESTING THE KUBERNETES AUTHENTICATOR CLIENT + SUMMON
 A fourth, architecturally distinct way to deliver secrets: a ```cyberark/conjur-authn-k8s-client``` sidecar authenticates the pod via JWT and writes *only* an access token to a shared volume - unlike every method above, it never fetches or pushes the secret itself. [Summon](https://github.com/cyberark/summon), baked into this variant's own image, uses that token to call the Secrets Manager REST API directly and inject the fetched values as real process environment variables before ```cityapp``` even starts - landing in the exact same ```getenv('DBADDR')``` code path ```cityapp-hardcode``` already used, so no application code changes were needed, only a different image build.
@@ -607,11 +607,11 @@ Builds ```localhost/cityapp:summon``` on top of ```localhost/cityapp:php``` (Par
 ```
 Deploys ```cityapp-summon``` with the authenticator sidecar. Using browser and go to ```http://<VM-IP>:30087``` to see the result - the page will show the secret source as "ENVIRONMENT", same as ```cityapp-hardcode```, but here the values were fetched live from Secrets Manager rather than baked into the Deployment spec.
 
-![cityappsummon](./images/16.cityapp-k8s-jwt-authn-summon-idira.png)
+<img src="./images/16.cityapp-k8s-jwt-authn-summon-idira.png" alt="cityappsummon" width="75%">
 
 This is the same JWT authentication flow used by every variant since Part II (a projected ServiceAccount token, exchanged for a Secrets Manager access token) - the diagram below traces the full path, from the authenticator sidecar's token all the way to Summon injecting the fetched secret into cityapp's environment.
 
-![jwtauthnflow](./images/15.k8s-jwt-authn-flow.png)
+<img src="./images/15.k8s-jwt-authn-flow.png" alt="jwtauthnflow" width="75%">
 
 # PART IV: FINAL TESTING
 This is the actual payoff of the whole lab: rotate the real database password once, and watch each of the 9 integration methods handle it differently - some update live, some need a redeploy, and two are deliberately left broken. It's done in up to three steps, but most people only need the first one.
@@ -626,7 +626,7 @@ Changes the actual MySQL password and updates ```test/host1/pass``` in Secrets M
 http://<VM-IP>:30001/matrix.html
 ```
 
-![rotationmatrix](./images/16.rotation-page-idira.png)
+<img src="./images/16.rotation-page-idira.png" alt="rotationmatrix" width="75%">
 
 | App | Port | After rotation |
 |---|---|---|
