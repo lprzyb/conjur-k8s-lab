@@ -157,6 +157,20 @@ csiprovider_current=$(grep -m1 -oE -- "--version [0-9.]+" 6.conjur-csi/03.instal
 csiprovider_latest=$(helm_repo_latest https://cyberark.github.io/helm-charts/index.yaml conjur-k8s-csi-provider)
 report "conjur-k8s-csi-provider Helm chart" "$csiprovider_current" "$csiprovider_latest" "6.conjur-csi/03.installing-conjur-csi-provider.sh"
 
+# --- 7.conjur-summon ---------------------------------------------------------
+
+authnclient_current=$(grep -m1 -oE "conjur-authn-k8s-client:[0-9.]+" 7.conjur-summon/yaml/cityapp-summon.yaml | cut -d: -f2)
+authnclient_latest=$(dockerhub_tags cyberark/conjur-authn-k8s-client | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -t. -k1,1n -k2,2n -k3,3n | tail -1)
+report "conjur-authn-k8s-client" "$authnclient_current" "$authnclient_latest" "7.conjur-summon/yaml/cityapp-summon.yaml"
+
+summon_current=$(grep -oE "summon/releases/download/v[0-9.]+" 7.conjur-summon/build/Dockerfile | head -1 | grep -oE '[0-9.]+$')
+summon_latest=$(github_latest_tag cyberark/summon | sed 's/^v//')
+report "summon" "$summon_current" "$summon_latest" "7.conjur-summon/build/Dockerfile"
+
+summonconjur_current=$(grep -oE "summon-conjur/releases/download/v[0-9.]+" 7.conjur-summon/build/Dockerfile | head -1 | grep -oE '[0-9.]+$')
+summonconjur_latest=$(github_latest_tag cyberark/summon-conjur | sed 's/^v//')
+report "summon-conjur" "$summonconjur_current" "$summonconjur_latest" "7.conjur-summon/build/Dockerfile"
+
 # --- summary -----------------------------------------------------------
 
 echo

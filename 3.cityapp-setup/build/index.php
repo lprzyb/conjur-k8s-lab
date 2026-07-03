@@ -100,6 +100,10 @@
       'title' => 'Secrets Store CSI Driver',
       'blurb' => 'The Secrets Store CSI Driver mounts the secret live as a volume at pod startup, authenticating on the driver\'s behalf via an explicit identity - no JWT token is projected into this pod at all.',
     ],
+    'summon' => [
+      'title' => 'Kubernetes Authenticator Client + Summon',
+      'blurb' => 'A separate authenticator sidecar proves this pod\'s identity via JWT and writes only an access token to a shared volume - it never touches the secret itself. Summon, baked into this image, uses that token to fetch the real values from the Secrets Manager REST API and injects them as env vars before cityapp\'s process even starts, decoupling authentication from secret retrieval for the first time in this lab.',
+    ],
   ];
   $demo_method = $demo_methods[getenv('DEMO_METHOD')] ?? null;
   ?>

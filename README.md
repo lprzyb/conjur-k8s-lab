@@ -571,10 +571,38 @@ Creates a ```SecretProviderClass``` named ```conjur-credentials``` in the ```cit
 ```
 Deploys ```cityapp-csi```, mounting secrets via the CSI volume at ```/etc/secret-volume``` (resolved from ```test/host1/*```, the same working demo credentials used since Part II). Using browser and go to ```http://<VM-IP>:30086``` to see the result.
 
+# PART III-C: TESTING THE KUBERNETES AUTHENTICATOR CLIENT + SUMMON
+A fourth, architecturally distinct way to deliver secrets: a ```cyberark/conjur-authn-k8s-client``` sidecar authenticates the pod via JWT and writes *only* an access token to a shared volume - unlike every method above, it never fetches or pushes the secret itself. [Summon](https://github.com/cyberark/summon), baked into this variant's own image, uses that token to call the Secrets Manager REST API directly and inject the fetched values as real process environment variables before ```cityapp``` even starts - landing in the exact same ```getenv('DBADDR')``` code path ```cityapp-hardcode``` already used, so no application code changes were needed, only a different image build.
+
+## Step3C.1: Reviewing 00.config.sh
+```
+cd /opt/lab/conjur-k8s-lab/7.conjur-summon
+vi 00.config.sh
+```
+Set ```READY=true``` to continue - this folder reuses the same ```2.conjur-setup/00.config.sh``` values.
+
+## Step3C.2: Loading the Summon Secrets Manager policy
+```
+./00.adding-conjur-summon-policy.sh
+```
+Adds a ```cityapp-summon``` host to the existing ```authn-jwt/k8s``` authenticator and grants it read/execute on ```test/host1/*``` - the same working demo credentials used since Part II. Like ESO's policy in Part III-A, this is a self-contained addition and does not modify ```2.conjur-setup/policies/authn-jwt-k8s.yaml```.
+
+## Step3C.3: Building the cityapp-summon image
+```
+./01.building-cityapp-summon-image.sh
+```
+Builds ```localhost/cityapp:summon``` on top of ```localhost/cityapp:php``` (Part III's image must be built first) - adds the Summon binary and the ```summon-conjur``` provider, and overrides the entrypoint to ```summon -f /etc/summon/secrets.yml apache2-foreground```.
+
+## Step3C.4: Running cityapp-summon
+```
+./02.running-cityapp-summon.sh
+```
+Deploys ```cityapp-summon``` with the authenticator sidecar. Using browser and go to ```http://<VM-IP>:30087``` to see the result - the page will show the secret source as "ENVIRONMENT", same as ```cityapp-hardcode```, but here the values were fetched live from Secrets Manager rather than baked into the Deployment spec.
+
 # PART IV: FINAL TESTING
 Run ```2.conjur-setup/13.rotating-db-password.sh``` (equivalent to ```2.conjur-setup/13.rotating-db-password.sh host1```). It changes the actual MySQL password for the demo DB user and updates ```test/host1/pass``` in Secrets Manager to match - deliberately leaving ```test/host2/pass``` untouched. Refresh each cityapp webpage after ~30-60 seconds to see how each method actually handles a rotated credential:
 - ```cityapp-conjurtok8sfile``` (30081) and ```cityapp-conjurtok8ssecret``` (30082) pick it up live, no redeploy needed - the secrets-provider sidecar keeps refreshing the file/Secret it writes to, and both apps read that shared volume fresh on every page load.
-- ```cityapp-conjurtok8ssecret-init``` (30085), ```cityapp-springboot-sidecar``` (30083), ```cityapp-springboot-native``` (30088) and ```cityapp-csi``` (30086) need a redeploy: conjurtok8ssecret-init's Secrets Provider runs as a true initContainer, so it fetches ```db-creds``` once, to completion, before cityapp ever starts, with no ongoing process to refresh it afterward; springboot-sidecar's DB password is wired up as a `secretKeyRef` env var, which Kubernetes captures once at pod start and never live-updates even though the same sidecar keeps the underlying Secret current; springboot-native fetches once via the Secrets Manager SDK at startup with no refresh loop; and this lab's CSI driver install doesn't enable secret rotation, so the mounted volume is fetched once too.
+- ```cityapp-conjurtok8ssecret-init``` (30085), ```cityapp-springboot-sidecar``` (30083), ```cityapp-springboot-native``` (30088), ```cityapp-csi``` (30086) and ```cityapp-summon``` (30087) need a redeploy: conjurtok8ssecret-init's Secrets Provider runs as a true initContainer, so it fetches ```db-creds``` once, to completion, before cityapp ever starts, with no ongoing process to refresh it afterward; springboot-sidecar's DB password is wired up as a `secretKeyRef` env var, which Kubernetes captures once at pod start and never live-updates even though the same sidecar keeps the underlying Secret current; springboot-native fetches once via the Secrets Manager SDK at startup with no refresh loop; this lab's CSI driver install doesn't enable secret rotation, so the mounted volume is fetched once too; and Summon fetches once and ```exec```s into cityapp's own process, so there's no Summon process left running afterward to refetch anything.
 - ```cityapp-hardcode``` (30080) and ```cityapp-eso``` (30084) are left showing a DB connection error: hardcode because it never talks to Secrets Manager at all, eso because it reads ```test/host2/*```, which the script leaves alone on purpose. This is the actual payoff of the whole lab - a live side-by-side of what a credential rotation costs you with each method.
 
 To bring ```cityapp-eso``` back afterward without doing a fresh rotation, run ```2.conjur-setup/13.rotating-db-password.sh host2``` - it copies ```test/host1/pass```'s current value into ```test/host2/pass``` (no MySQL change, since the password itself hasn't changed). Or run ```2.conjur-setup/13.rotating-db-password.sh all``` next time to rotate MySQL and update both ```test/host1/pass``` and ```test/host2/pass``` together in one step, leaving only ```cityapp-hardcode``` stuck on the old password.

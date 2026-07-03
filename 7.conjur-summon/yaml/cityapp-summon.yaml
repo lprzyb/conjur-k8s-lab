@@ -1,0 +1,101 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: summon-secrets
+data:
+  secrets.yml: |-
+    DBADDR: !var test/host1/host
+    DBUSER: !var test/host1/user
+    DBPASS: !var test/host1/pass
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cityapp-summon
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cityapp-summon
+  labels:
+    app: cityapp-summon
+spec:
+  ports:
+  - port: 80
+    nodePort: 30087
+    name: http
+  selector:
+    app: cityapp-summon
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: cityapp-summon
+  name: cityapp-summon
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cityapp-summon
+  template:
+    metadata:
+      labels:
+        app: cityapp-summon
+    spec:
+      serviceAccountName: cityapp-summon
+      hostAliases:
+      - ip: "{LAB_IP}"
+        hostnames:
+        - "{DB_HOST}"
+      containers:
+      - name: cityapp
+        image: localhost/cityapp:summon
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: DEMO_METHOD
+            value: summon
+          - name: CONJUR_AUTHN_TOKEN_FILE
+            value: /run/conjur/access-token
+          - name: CONJUR_CREDENTIAL_STORAGE
+            value: none
+        envFrom:
+          - configMapRef:
+              name: apps-cm
+        volumeMounts:
+          - name: conjur-access-token
+            mountPath: /run/conjur
+            readOnly: true
+          - name: summon-secrets
+            mountPath: /etc/summon
+            readOnly: true
+      - name: authenticator
+        image: docker.io/cyberark/conjur-authn-k8s-client:0.26.13
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: JWT_TOKEN_PATH
+            value: /var/run/secrets/tokens/jwt
+        envFrom:
+          - configMapRef:
+              name: apps-cm
+        volumeMounts:
+          - mountPath: /run/conjur
+            name: conjur-access-token
+          - mountPath: /var/run/secrets/tokens
+            name: jwt-token
+      volumes:
+        - name: conjur-access-token
+          emptyDir:
+            medium: Memory
+        - name: summon-secrets
+          configMap:
+            name: summon-secrets
+        - name: jwt-token
+          projected:
+            sources:
+              - serviceAccountToken:
+                  path: jwt
+                  expirationSeconds: 6000
+                  audience: '{JWT_AUDIENCE}'
