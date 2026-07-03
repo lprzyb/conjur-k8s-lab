@@ -75,22 +75,26 @@
     </li>
     <li>
       <span class="badge">3</span>
-      <span class="label"><a data-port="30082" href="#" target="_blank" rel="noopener noreferrer">Push to K8s Secret</a><p>3.cityapp-setup - Secrets Provider, push to k8s Secret</p></span>
+      <span class="label"><a data-port="30082" href="#" target="_blank" rel="noopener noreferrer">Push to K8s Secret (Sidecar)</a><p>3.cityapp-setup - Secrets Provider sidecar, push to k8s Secret</p></span>
     </li>
     <li>
       <span class="badge">4</span>
-      <span class="label"><a data-port="30083" href="#" target="_blank" rel="noopener noreferrer">Spring Boot (Sidecar)</a><p>3.cityapp-setup - Secrets Provider sidecar, push to k8s Secret</p></span>
+      <span class="label"><a data-port="30085" href="#" target="_blank" rel="noopener noreferrer">Push to K8s Secret (Init Container)</a><p>3.cityapp-setup - Secrets Provider init container, push to k8s Secret</p></span>
     </li>
     <li>
       <span class="badge">5</span>
-      <span class="label"><a data-port="30088" href="#" target="_blank" rel="noopener noreferrer">Spring Boot (Native SDK)</a><p>4.cityapp-springboot - app calls the Secrets Manager API directly, no sidecar</p></span>
+      <span class="label"><a data-port="30083" href="#" target="_blank" rel="noopener noreferrer">Spring Boot (Sidecar)</a><p>3.cityapp-setup - Secrets Provider sidecar, push to k8s Secret</p></span>
     </li>
     <li>
       <span class="badge">6</span>
-      <span class="label"><a data-port="30084" href="#" target="_blank" rel="noopener noreferrer">External Secrets Operator</a><p>5.conjur-eso - ESO syncs a Secrets Manager secret into a native K8s Secret</p></span>
+      <span class="label"><a data-port="30088" href="#" target="_blank" rel="noopener noreferrer">Spring Boot (Native SDK)</a><p>4.cityapp-springboot - app calls the Secrets Manager API directly, no sidecar</p></span>
     </li>
     <li>
       <span class="badge">7</span>
+      <span class="label"><a data-port="30084" href="#" target="_blank" rel="noopener noreferrer">External Secrets Operator</a><p>5.conjur-eso - ESO syncs a Secrets Manager secret into a native K8s Secret</p></span>
+    </li>
+    <li>
+      <span class="badge">8</span>
       <span class="label"><a data-port="30086" href="#" target="_blank" rel="noopener noreferrer">Secrets Store CSI Driver</a><p>6.conjur-csi - CSI provider mounts secrets live, no sidecar</p></span>
     </li>
   </ul>
@@ -103,7 +107,7 @@
     });
   </script>
 
-  <p><a class="btn" href="matrix.html">&#8862; View all 7 demos at once - Rotation Matrix</a></p>
+  <p><a class="btn" href="matrix.html">&#8862; View all 8 demos at once - Rotation Matrix</a></p>
 
   <footer>
     <p>An IDIRA demo by Luke Przybylski (lprzybylski@paloaltonetworks.com), inspired by Joe Tan and Huy Do.</p>

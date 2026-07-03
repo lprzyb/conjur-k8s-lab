@@ -24,7 +24,7 @@
 </head>
 <body>
   <h1>Secrets Manager K8s Lab - Rotation Matrix</h1>
-  <p class="intro">All 7 cityapp demo variants at once - useful for watching PART IV's password rotation land (or not) across every method side by side. Each app also auto-refreshes itself every 30s.</p>
+  <p class="intro">All 8 cityapp demo variants at once - useful for watching PART IV's password rotation land (or not) across every method side by side. Each app also auto-refreshes itself every 30s.</p>
 
   <div class="toolbar">
     <button class="btn" onclick="refreshAll()">&#8635; Refresh All</button>
@@ -41,23 +41,27 @@
       <iframe data-port="30081" src="about:blank"></iframe>
     </div>
     <div class="cell">
-      <div class="cell-header"><span class="badge">3</span><span class="cell-title">Push to K8s Secret<span>3.cityapp-setup - :30082</span></span></div>
+      <div class="cell-header"><span class="badge">3</span><span class="cell-title">Push to K8s Secret (Sidecar)<span>3.cityapp-setup - :30082</span></span></div>
       <iframe data-port="30082" src="about:blank"></iframe>
     </div>
     <div class="cell">
-      <div class="cell-header"><span class="badge">4</span><span class="cell-title">Spring Boot (Sidecar)<span>3.cityapp-setup - :30083</span></span></div>
+      <div class="cell-header"><span class="badge">4</span><span class="cell-title">Push to K8s Secret (Init Container)<span>3.cityapp-setup - :30085</span></span></div>
+      <iframe data-port="30085" src="about:blank"></iframe>
+    </div>
+    <div class="cell">
+      <div class="cell-header"><span class="badge">5</span><span class="cell-title">Spring Boot (Sidecar)<span>3.cityapp-setup - :30083</span></span></div>
       <iframe data-port="30083" src="about:blank"></iframe>
     </div>
     <div class="cell">
-      <div class="cell-header"><span class="badge">5</span><span class="cell-title">Spring Boot (Native SDK)<span>4.cityapp-springboot - :30088</span></span></div>
+      <div class="cell-header"><span class="badge">6</span><span class="cell-title">Spring Boot (Native SDK)<span>4.cityapp-springboot - :30088</span></span></div>
       <iframe data-port="30088" src="about:blank"></iframe>
     </div>
     <div class="cell">
-      <div class="cell-header"><span class="badge">6</span><span class="cell-title">External Secrets Operator<span>5.conjur-eso - :30084</span></span></div>
+      <div class="cell-header"><span class="badge">7</span><span class="cell-title">External Secrets Operator<span>5.conjur-eso - :30084</span></span></div>
       <iframe data-port="30084" src="about:blank"></iframe>
     </div>
     <div class="cell">
-      <div class="cell-header"><span class="badge">7</span><span class="cell-title">Secrets Store CSI Driver<span>6.conjur-csi - :30086</span></span></div>
+      <div class="cell-header"><span class="badge">8</span><span class="cell-title">Secrets Store CSI Driver<span>6.conjur-csi - :30086</span></span></div>
       <iframe data-port="30086" src="about:blank"></iframe>
     </div>
   </div>
