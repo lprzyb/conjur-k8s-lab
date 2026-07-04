@@ -6,6 +6,7 @@ Ideas for future lab additions, not yet scoped or scheduled.
 - **Vault Synchronizer**: install it silently, sync a secret from PAM, create a new workload/policy for it, and deploy a new cityapp variant that consumes the synced secret.
 - **Split policy loading per-application**: instead of loading all demo policy up front (`2.conjur-setup/policies/demo-data.yaml`), load one policy per app as it's deployed - similar to how `5.conjur-eso/` already loads its own self-contained policy file. Brainstorm later, not scoped yet.
 - **Fake ticketing portal**: a small web portal where a dev requests a new application; the backend creates the secret + policy in Secrets Manager, and the response gives the dev the variable paths to put in their deployment spec plus a choice of secrets-provider method.
+- **Conjur Cloud (SaaS) sibling repo**: full mirror of all 9 cityapp methods rebuilt against Secrets Manager SaaS instead of self-hosted Enterprise - scoped as a separate sibling repo, tenant access and non-interactive login confirmed available. See [conjur-cloud-plan.md](./conjur-cloud-plan.md) for the detailed breakdown of what carries over vs. what must be rebuilt, and the open items to resolve before starting.
 
 ## Non-K8s use cases: Ansible / Terraform / Jenkins (scoped, ready to build)
 
